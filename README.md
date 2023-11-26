@@ -157,7 +157,7 @@ A la fin de chaque manche, le score de manche de chaque joueur s’additionne à
 Une partie se termine après qu’un nombre prédéfini de manches aient été effectuées.
 La personne ayant le plus grand score de partie remporte la partie.
 
-## règles supplémentaires
+## Règles supplémentaires
 
 * Le Donneur peux choisir 3 types de chiens: chiuaua, bulldog et labrador. A 3 joueurs: 3 cartes, 6 cartes et 9 cartes. A 4 joueurs: 2 cartes, 6 cartes et 10 cartes.
 * S'il y un pli avec que des aouts, les joueurs donnent deux cartes au hasard au joueur de droite.
