@@ -20,10 +20,10 @@ public class Partie {
     public Partie(int nombreJoueurs, Deck deckTarot, int nombreDeManches) {
         melangeDuDeck(deckTarot);
         joueur1 = new Joueur("Joueur 1", main1, 0, 1);
-        joueur2 = new Joueur("Joueur 2", main2, 0, 2);
-        joueur3 = new Joueur("Joueur 3", main3, 0, 3);
+        joueur2 = new Joueur("Joueur 2", main2, 0, 1);
+        joueur3 = new Joueur("Joueur 3", main3, 0, 1);
         if (nombreJoueurs == 4) {
-            joueur4 = new Joueur("Joueur 4", main4, 0, 4);
+            joueur4 = new Joueur("Joueur 4", main4, 0, 1);
             // for (int i = 1; i <= nombreDeManches; i++) {
             int typeChien = 10;
             int count = 0;
@@ -47,13 +47,15 @@ public class Partie {
             joueur1.mainJoueur = manche.joueur1.mainJoueur;
             joueur2.mainJoueur = manche.joueur2.mainJoueur;
             joueur3.mainJoueur = manche.joueur3.mainJoueur;
-            for (int i = 0; i < joueur2.mainJoueur.size(); i++) {
-                System.out.println(joueur2.mainJoueur.get(i).nomCarte);
-                count++;
-            }
-            System.out.println(count);
-            // }
-            calculPointsPartie();
+            /*
+             * for (int i = 0; i < joueur2.mainJoueur.size(); i++) {
+             * System.out.println(joueur1.mainJoueur.get(i).nomCarte);
+             * count++;
+             * }
+             * System.out.println(count);
+             * // }
+             * calculPointsPartie();
+             */
         }
     }
 

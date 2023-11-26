@@ -13,10 +13,8 @@ public class Pli {
     public List<Carte> pliAttaque;
     public List<Carte> pliDefense;
 
-    public Pli(List<Joueur> joueurs, List<Carte> pliAttaque, List<Carte> pliDefense) {
+    public Pli(List<Joueur> joueurs) {
         this.joueurs = joueurs;
-        this.pliAttaque=pliAttaque;
-        this.pliDefense=pliDefense;
         jouerPli();
     }
 
@@ -33,19 +31,17 @@ public class Pli {
             if (couleurDemandee == null) {
                 couleurDemandee = carteJouee.getType();
             }
-
             // Déterminer la carte gagnante du pli
             if (estCarteGagnante(carteJouee)) {
                 carteGagnante = carteJouee;
                 joueurGagnant = joueur;
             }
         }
-
         // À la fin du pli, attribuer le pli à l'équipe gagnante
         if (joueurGagnant.roleJoueur == "Attaquant") {
-            pliAttaque.addAll(cartesJouees);
+            Manche.pliAttaque.addAll(cartesJouees);
         } else {
-            pliDefense.addAll(cartesJouees);
+            Manche.pliDefense.addAll(cartesJouees);
         }
     }
 

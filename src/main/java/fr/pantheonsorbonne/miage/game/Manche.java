@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
+import java.util.Random;
 
 public class Manche {
 
+    Random rand = new Random();
     Joueur joueur1;
     Joueur joueur2;
     Joueur joueur3;
@@ -20,7 +23,7 @@ public class Manche {
     String P2 = "Petite";
     String P1 = "Passer";
     List<Joueur> joueurs = new ArrayList<>();
-    Map<String, Integer> misesHM = new HashMap<String, Integer>() {
+    Map<String, Integer> conteurDeMises = new HashMap<String, Integer>() {
         {
             put(GC, 0);
             put(GS, 0);
@@ -32,8 +35,8 @@ public class Manche {
     Map<Joueur, Integer> misesPartie = new HashMap<>();
 
     Joueur attaquant;
-    public List<Carte> pliDefense;
-    public List<Carte> pliAttaque;
+    public static List<Carte> pliDefense = new ArrayList<>();
+    public static List<Carte> pliAttaque = new ArrayList<>();
     Pli pli;
 
     public Manche(Joueur j1, Joueur j2, Joueur j3, Joueur j4, List<Carte> dM, int tC) {
@@ -88,10 +91,21 @@ public class Manche {
         joueurs.add(joueur1);
         deckMelange = dM;
         typeChien = tC;
-        while (misesPartie.get(joueur1) == 0 && misesPartie.get(joueur2) == 0 && misesPartie.get(joueur3) == 0) {
+        while (misesPartie.get(joueur1) == 0 && misesPartie.get(joueur2) == 0 &&
+                misesPartie.get(joueur3) == 0) {
+            joueur1.mainJoueur.clear();
+            joueur2.mainJoueur.clear();
+            joueur3.mainJoueur.clear();
             distributionTroisJoueurs();
+            for (int i = 0; i < joueur1.mainJoueur.size(); i++) {
+                System.out.println(joueur1.mainJoueur.get(i).getNom());
+            }
+            System.out.println("fin de distribution");
+            System.out.println();
             misesJoueurs();
+            System.out.println(misesPartie);
         }
+
         int maxValue = 0;
         for (Joueur i : joueurs) {
             if (misesPartie.get(i) > maxValue) {
@@ -104,29 +118,40 @@ public class Manche {
                 i.roleJoueur = "Attaquant";
             }
         }
-
-        lancementDesPlis();
-        calculPointsDeManche();
+        recuperationDuChien();
+        // lancementDesPlis();
+        // calculPointsDeManche();
     }
 
     public void lancementDesPlis() {
         while (!joueur1.mainJoueur.isEmpty()) {
-            pli = new Pli(joueurs, pliAttaque, pliDefense);
+            System.out.println(joueur1.mainJoueur.size());
+            new Pli(joueurs);
+            System.out.println("check");
         }
+        System.out.println("finished?");
     }
 
     public void misesJoueurs() {
         for (Joueur i : joueurs) {
             i.miseJoueur = joueurMise(i, i.mainJoueur);
-            misesHM.put(i.miseJoueur, 1);
-            if (i.miseJoueur == GC) {
-                misesPartie.put(i, 4);
-            } else if (i.miseJoueur.equals(GS)) {
-                misesPartie.put(i, 3);
-            } else if (i.miseJoueur.equals(G)) {
-                misesPartie.put(i, 2);
-            } else if (i.miseJoueur.equals(P2)) {
-                misesPartie.put(i, 1);
+            conteurDeMises.put(i.miseJoueur, 1);
+            switch (i.miseJoueur) {
+                case "Garde Contre":
+                    misesPartie.put(i, 4);
+                    break;
+                case "Garde Sans":
+                    misesPartie.put(i, 3);
+                    break;
+                case "Garde":
+                    misesPartie.put(i, 2);
+                    break;
+                case "Petite":
+                    misesPartie.put(i, 1);
+                    break;
+                default:
+                    misesPartie.put(i, 0);
+                    break;
             }
         }
     }
@@ -136,162 +161,191 @@ public class Manche {
         int countBout = cartesSpeciales[0];
         int countRoi = cartesSpeciales[1];
         int countAtout = cartesSpeciales[2];
-        if (countAtout >= 15) {
-            return GC;
-        }
-        if (countBout == 3) {
-            if (countRoi >= 2) {
-                if (countAtout >= 6) {
-                    return GC;
-                } else if (misesHM.get(GS) != 1) {
+        if (conteurDeMises.get(GC) != 1) {
+            if (countAtout > 16) {
+                System.out.println("case 1!");
+                return GC;
+            }
+            if (conteurDeMises.get(GS) != 1) {
+                if (countAtout >= 14) {
+                    System.out.println("case 2!");
                     return GS;
                 }
+                if (conteurDeMises.get(G) != 1) {
+                    if (countAtout >= 12) {
+                        System.out.println("case 3!");
+                        return G;
+                    }
+                    if (countAtout >= 10 && conteurDeMises.get(P2) != 1) {
+                        System.out.println("case 4");
+                        return P2;
+                    }
+                }
             }
-            if (countAtout >= 6 && misesHM.get(GS) != 1) {
-                return GS;
-            } else if (misesHM.get(GS) != 1 && misesHM.get(G) != 1) {
-                return G;
+            if (countBout == 3) {
+                if (countRoi >= 1) {
+                    if (countAtout >= 6) {
+                        System.out.println("case 5!");
+                        return GC;
+                    } else if (conteurDeMises.get(GS) != 1) {
+                        System.out.println("case 6!");
+                        return GS;
+                    }
+                }
+                if (conteurDeMises.get(GS) != 1) {
+                    if (countAtout >= 6) {
+                        System.out.println("case 7!");
+                        return GS;
+                    } else if (conteurDeMises.get(G) != 1) {
+                        System.out.println("case 8!");
+                        return G;
+                    }
+                }
+            }
+            if (countBout == 2) {
+                if (countRoi == 4) {
+                    if (countAtout >= 9) {
+                        System.out.println("case 9!");
+                        return GC;
+                    }
+                    if (conteurDeMises.get(GS) != 1) {
+                        if (countAtout >= 6) {
+                            System.out.println("case 10!");
+                            return GS;
+                        }
+                        if (conteurDeMises.get(G) != 1) {
+                            if (countAtout >= 4) {
+                                System.out.println("case 11!");
+                                return G;
+                            }
+                            if (conteurDeMises.get(P2) != 1) {
+                                System.out.println("case 12!");
+                                return P2;
+                            }
+                        }
+                    }
+                }
+                if (countRoi == 3) {
+                    if (countAtout >= 12) {
+                        System.out.println("case 13!");
+                        return GC;
+                    }
+                    if (conteurDeMises.get(GS) != 1) {
+                        if (countAtout >= 8) {
+                            System.out.println("case 14!");
+                            return GS;
+                        }
+                        if (conteurDeMises.get(G) != 1) {
+                            if (countAtout >= 6) {
+                                System.out.println("case 15!");
+                                return G;
+                            }
+                            if (countAtout >= 4 && conteurDeMises.get(P2) != 1) {
+                                System.out.println("case 16!");
+                                return P2;
+                            }
+                        }
+                    }
+                }
+                if (conteurDeMises.get(GS) != 1) {
+                    if (countRoi == 2) {
+                        if (countAtout >= 10) {
+                            System.out.println("case 17!");
+                            return GS;
+                        }
+                        if (conteurDeMises.get(G) != 1) {
+                            if (countAtout >= 6) {
+                                System.out.println("case 18!");
+                                return G;
+                            }
+                            if (countAtout >= 4 && conteurDeMises.get(P2) != 1) {
+                                System.out.println("case 19!");
+                                return P2;
+                            }
+                        }
+                    }
+                    if (conteurDeMises.get(G) != 1) {
+                        if (countRoi == 1) {
+                            if (countAtout >= 8) {
+                                System.out.println("case 20!");
+                                return G;
+                            } else if (countAtout >= 4 && conteurDeMises.get(P2) != 1) {
+                                System.out.println("case 21!");
+                                return P2;
+                            }
+                        }
+                        if (countRoi == 0) {
+                            if (countAtout >= 6 && conteurDeMises.get(P2) != 1) {
+                                System.out.println("case 22!");
+                                return P2;
+                            }
+                        }
+                    }
+                }
+            }
+            if (conteurDeMises.get(G) != 1 && conteurDeMises.get(GS) != 1) {
+                if (countBout == 1) {
+                    if (countRoi == 4) {
+                        if (countAtout >= 6) {
+                            System.out.println("case 23!");
+                            return G;
+                        }
+                        if (countAtout >= 4 && conteurDeMises.get(P2) != 1) {
+                            System.out.println("case 24!");
+                            return P2;
+                        }
+                    }
+                    if (countRoi == 3) {
+                        if (countAtout >= 8) {
+                            System.out.println("case 25!");
+                            return G;
+                        } else if (countAtout >= 6 && conteurDeMises.get(P2) != 1) {
+                            System.out.println("case 26!");
+                            return P2;
+                        }
+                    }
+                    if (countRoi == 2) {
+                        if (countAtout >= 8 && conteurDeMises.get(P2) != 1) {
+                            System.out.println("case 27!");
+                            return P2;
+                        }
+                    }
+                }
+                if (countBout == 0 && countRoi == 4) {
+                    if (countAtout >= 10) {
+                        System.out.println("case 28!");
+                        return G;
+                    }
+                    if (countAtout >= 8 && conteurDeMises.get(P2) != 1) {
+                        System.out.println("case 29!");
+                        return P2;
+                    }
+                }
             }
         }
-        if (countBout == 2) {
-            if (countRoi == 4) {
-                if (countAtout >= 9) {
-                    return GC;
-                }
-                if (countAtout >= 6 && misesHM.get(GS) != 1) {
-                    return GS;
-                }
-                if (countAtout >= 4 && misesHM.get(GS) != 1 && misesHM.get(G) != 1) {
-                    return G;
-                } else if (misesHM.get(G) != 1 && misesHM.get(P2) != 1) {
-                    return P2;
-                }
-            }
-            if (countRoi == 3) {
-                if (countAtout >= 13) {
-                    return GC;
-                }
-                if (countAtout >= 9 && misesHM.get(GS) != 1) {
-                    return GS;
-                }
-                if (countAtout >= 6 && misesHM.get(GS) != 1 && misesHM.get(G) != 1) {
-                    return G;
-                }
-                if (countAtout >= 4 && misesHM.get(G) != 1 && misesHM.get(P2) != 1) {
-                    return P2;
-                } else {
-                    return P1;
-                }
-            }
-            if (countRoi == 2) {
-                if (countAtout >= 12 && misesHM.get(GS) != 1) {
-                    return GS;
-                }
-                if (countAtout >= 6 && misesHM.get(GS) != 1 && misesHM.get(G) != 1) {
-                    return G;
-                }
-                if (countAtout >= 4 && misesHM.get(G) != 1 && misesHM.get(P2) != 1) {
-                    return P2;
-                } else {
-                    return P1;
-                }
-            }
-            if (countRoi == 1) {
-                if (countAtout >= 12 && misesHM.get(GS) != 1 && misesHM.get(G) != 1) {
-                    return G;
-                } else if (countAtout >= 6 && misesHM.get(G) != 1 && misesHM.get(P2) != 1) {
-                    return P2;
-                } else {
-                    return P1;
-                }
-            }
-            if (countRoi == 0) {
-                if (countAtout >= 12 && misesHM.get(G) != 1 && misesHM.get(P2) != 1) {
-                    return P2;
-                } else {
-                    return P1;
-                }
-            }
-        } else if (countBout == 1) {
-            if (countRoi == 4) {
-                if (countAtout >= 10 && misesHM.get(GS) != 1 && misesHM.get(G) != 1) {
-                    return G;
-                }
-                if (countAtout >= 6 && misesHM.get(G) != 1 && misesHM.get(P2) != 1) {
-                    return P2;
-                } else {
-                    return P1;
-                }
-            }
-            if (countRoi == 3) {
-                if (countAtout >= 12 && misesHM.get(GS) != 1 && misesHM.get(G) != 1) {
-                    return G;
-                } else if (countAtout >= 8 && misesHM.get(G) != 1 && misesHM.get(P2) != 1) {
-                    return P2;
-                } else {
-                    return P1;
-                }
-            }
-            if (countRoi == 2) {
-                if (countAtout >= 10 && misesHM.get(G) != 1 && misesHM.get(P2) != 1) {
-                    return P2;
-                } else {
-                    return P1;
-                }
-            }
-            if (countRoi == 1) {
-                if (countAtout >= 13 && misesHM.get(G) != 1 && misesHM.get(P2) != 1) {
-                    return P2;
-                } else {
-                    return P1;
-                }
-            }
-            if (countRoi == 0) {
-                return P1;
-            }
-        }
-        if (countBout == 0) {
-            if (countRoi == 4) {
-                if (countAtout >= 12 && misesHM.get(GS) != 1 && misesHM.get(G) != 1) {
-                    return G;
-                }
-                if (countAtout >= 9 && misesHM.get(G) != 1 && misesHM.get(P2) != 1) {
-                    return P2;
-                } else {
-                    return P1;
-                }
-            }
-            if (countRoi == 3) {
-                if (countAtout >= 12 && misesHM.get(G) != 1 && misesHM.get(P2) != 1) {
-                    return P2;
-                } else {
-                    return P1;
-                }
-            }
-            if (countRoi <= 2) {
-                return P1;
-            }
-        }
+        System.out.println("case 30!");
         return P1;
     }
 
     public int[] nombreCartesSpeciales(Joueur joueur, List<Carte> main) {
         int[] cartesSpeciales = new int[3];
         for (int i = 0; i < main.size(); i++) {
-            if (joueur.mainJoueur.get(i).carteBout == true) {
+            if (joueur.mainJoueur.get(i).carteBout) {
                 cartesSpeciales[0]++;
             }
-            if (joueur.mainJoueur.get(i).typeCarte == "Roi") {
+            if (joueur.mainJoueur.get(i).typeCarte.equals("Atout")) {
+                cartesSpeciales[2]++;
+            } else if (joueur.mainJoueur.get(i).valeurCarte == 14) {
                 cartesSpeciales[1]++;
             }
-            if (joueur.mainJoueur.get(i).typeCarte == "Atout") {
-                cartesSpeciales[2]++;
-            }
         }
+        System.out.println(
+                "Bouts: " + cartesSpeciales[0] + " Rois: " + cartesSpeciales[1] + " Atouts: " + cartesSpeciales[2]);
         return cartesSpeciales;
     }
 
     public void distributionQuatreJoueurs() {
+        Collections.rotate(deckMelange, deckMelange.size() / (rand.nextInt(4) + 1));
         int countJ1 = 0;
         int countJ2 = 0;
         int countJ3 = 0;
@@ -374,7 +428,6 @@ public class Manche {
             }
             while (i < 74) {
                 joueur1.mainJoueur.add(deckMelange.get(i++));
-
             }
             joueur2.mainJoueur.add(deckMelange.get(i++));
             joueur3.mainJoueur.add(deckMelange.get(i++));
@@ -384,6 +437,7 @@ public class Manche {
     }
 
     public void distributionTroisJoueurs() {
+        Collections.rotate(deckMelange, deckMelange.size() / (rand.nextInt(4) + 1));
         int countJ1 = 0;
         int countJ2 = 0;
         int countJ3 = 0;
@@ -421,7 +475,6 @@ public class Manche {
             if (count == 21)
                 break;
         }
-
         if (typeChien == 9) {
             while (i < 74) {
                 joueur2.mainJoueur.add(deckMelange.get(i++));
@@ -461,6 +514,19 @@ public class Manche {
     public void calculPointsDeManche() {
 
     }
+
+    public void recuperationDuChien() {
+        for (Joueur i : joueurs) {
+            if (i.roleJoueur.equals("Attaquant")) {
+                for (Carte j : i.mainJoueur) {
+                    if (j.typeCarte.equals("Atout")){
+                        
+                    }
+                }
+            }
+        }
+    }
+
 }
 // Test git push etc
 // 2 eme test

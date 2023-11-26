@@ -13,7 +13,7 @@ public class Joueur {
     public int niveauJoueur; // Niveau d'intelligence du bot: 1 pour "dumb", 2 pour "normal", 3 pour "smart".
     public List<Carte> pliJoueur;
     public String roleJoueur = "Defenseur";
-    public HashMap <String, Integer> compteurMainJoueur = new HashMap<>() {
+    public HashMap<String, Integer> compteurMainJoueur = new HashMap<>() {
         {
             put("Trefle", 0);
             put("Pique", 0);
@@ -42,7 +42,8 @@ public class Joueur {
             case 3:
                 return jouerStrategieAvancee(couleurDemandee, carteGagnante);
             default:
-                return jouerCarteAuHasard(couleurDemandee, carteGagnante); // Fallback au hasard si le niveau n'est pas défini
+                return jouerCarteAuHasard(couleurDemandee, carteGagnante); // Fallback au hasard si le niveau n'est pas
+                                                                           // défini
         }
     }
 
@@ -50,26 +51,53 @@ public class Joueur {
     private Carte jouerCarteAuHasard(String couleurDemandee, Carte carteGagnante) {
         Random rand = new Random();
         Carte carteJouee = null;
-        if (couleurDemandee != null) {
-            do {
-                carteJouee = mainJoueur.get(rand.nextInt(mainJoueur.size()));
-            } while (!(carteJouee.typeCarte.equals(couleurDemandee)
-                    && !carteJouee.typeCarte.equals("Atout"))
-                    || !(carteJouee.typeCarte.equals(couleurDemandee) && carteJouee.typeCarte.equals("Atout")
-                            && carteJouee.valeurCarte > carteGagnante.valeurCarte)
-                    || !(carteJouee.typeCarte.equals(couleurDemandee) && carteJouee.typeCarte.equals("Atout")
-                            && nombreAtoutsSups == 0 && carteJouee.valeurCarte < carteGagnante.valeurCarte)
-                    || !(!carteJouee.typeCarte.equals(couleurDemandee) && couleurDemandee.equals("Atout")
-                            && compteurMainJoueur.get("Atout") == 0)
-                    || (!carteJouee.typeCarte.equals(couleurDemandee) && !couleurDemandee.equals("Atout")
-                            && compteurMainJoueur.get("Atout") == 0
-                            && compteurMainJoueur.get(couleurDemandee) == 0));
-        } else {
+    
+        while (true) {
             carteJouee = mainJoueur.get(rand.nextInt(mainJoueur.size()));
+    
+            if (isValidCard(carteJouee, couleurDemandee, carteGagnante)) {
+                break;
+            }
         }
+    
         mainJoueur.remove(carteJouee);
         return carteJouee;
     }
+    
+    private boolean isValidCard(Carte carteJouee, String couleurDemandee, Carte carteGagnante) {
+        if (couleurDemandee != null) {
+            if (carteJouee.typeCarte.equals(couleurDemandee) && !carteJouee.typeCarte.equals("Atout")) {
+                return true;
+            }
+    
+            if (carteJouee.typeCarte.equals(couleurDemandee) && carteJouee.typeCarte.equals("Atout")
+                    && carteJouee.valeurCarte > carteGagnante.valeurCarte) {
+                return true;
+            }
+    
+            if (carteJouee.typeCarte.equals(couleurDemandee) && carteJouee.typeCarte.equals("Atout")
+                    && nombreAtoutsSups == 0 && carteJouee.valeurCarte < carteGagnante.valeurCarte) {
+                return true;
+            }
+    
+            if (!carteJouee.typeCarte.equals(couleurDemandee) && couleurDemandee.equals("Atout")
+                    && compteurMainJoueur.get("Atout") == 0) {
+                return true;
+            }
+    
+            if (!carteJouee.typeCarte.equals(couleurDemandee) && !couleurDemandee.equals("Atout")
+                    && compteurMainJoueur.get("Atout") == 0
+                    && compteurMainJoueur.get(couleurDemandee) == 0) {
+                return true;
+            }
+        } else {
+            // Handle the case where couleurDemandee is null
+            return true; // Assuming any card is valid in this case
+        }
+    
+        return false;
+    }
+    
 
     // Stratégie de base pour le bot "normal"
     private Carte jouerStrategieDeBase(String couleurDemandee, Carte carteGagnante) {
@@ -92,9 +120,11 @@ public class Joueur {
     }
 
     public void calculateurDeType(Carte carteGagnante) {
+        int j=0;
         for (Carte i : mainJoueur) {
-            compteurMainJoueur.put(i.typeCarte, compteurMainJoueur.get(i.typeCarte) + 1);
-            if (i.typeCarte.equals("Atout") && i.valeurCarte > carteGagnante.valeurCarte) {
+            compteurMainJoueur.put(i.typeCarte, j++);
+            if (carteGagnante!=null && i.typeCarte.equals("Atout") && carteGagnante.typeCarte.equals("Atout")
+                    && (i.valeurCarte > carteGagnante.valeurCarte)) {
                 nombreAtoutsSups++;
             }
         }
