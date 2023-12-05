@@ -125,7 +125,7 @@ Score=(25+Différence+PetitAuBout)*Mise
 
 Total=Score+Poignée+Chelem
 
-La Différence est l’écart de points entre la somme calculée et la valeur requise. 
+La Différence est l’écart en valeur absolue de points entre la somme calculée et la valeur requise. Cet ecart est donc toujours positif.
 
 La Mise dépend de l’enchère. Elle vaut 1 pour une Petite, 2 pour une Garde, 4 pour une Garde Sans et 6 pour une Garde Contre.
 
