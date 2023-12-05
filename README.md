@@ -45,11 +45,11 @@ On peut également passer son tour.
 
 Celui qui "remporte" les enchères devient l'Attaquant qui jouera contre les autres joueurs (Défenseurs).
 
-Le joueur à la gauche du Donneur (celui qui a distribué les cartes) est le premier à miser.
+Le joueur à la droite du Donneur (celui qui a distribué les cartes) est le premier à miser.
 
 Les enchères se terminent quand le tour est complété et que chaque joueur a misé ou passé, ou quand un joueur à choisi de faire une Garde contre (car il est impossible de miser plus haut).
 
-Si tous les joueurs passent, on passe à la prochaine manche et le nouveau Donneur est le joueur à la gauche du donneur actuel, d'où l'importance de ne pas encore ordonner ses mains (le jeu de Tarot n'est jamais mélangé).
+Si tous les joueurs passent, on passe à la prochaine manche et le nouveau Donneur est le joueur à la droite du donneur actuel, d'où l'importance de ne pas encore ordonner ses mains (le jeu de Tarot n'est jamais mélangé).
 
 Les joueurs peuvent maintenant ordonner leurs mains.
 
