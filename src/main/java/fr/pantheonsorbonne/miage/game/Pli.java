@@ -24,30 +24,46 @@ public class Pli {
         this.joueurGagnant = null;
         this.cartesJouees = new ArrayList<>();
         for (Joueur joueur : joueurs) {
+            // for (Carte d : joueur.mainJoueur) {
+            // System.out.println(d.nomCarte);
+            // }
             Carte carteJouee = joueur.jouerCarte(this.couleurDemandee, this.carteGagnante);
             cartesJouees.add(carteJouee);
-
             // Déterminer la couleur demandée s'il s'agit de la première carte du pli
             if (couleurDemandee == null) {
                 couleurDemandee = carteJouee.getType();
+                if (couleurDemandee.equals("Excuse")) {
+                    couleurDemandee = null;
+                }
             }
+
             // Déterminer la carte gagnante du pli
             if (estCarteGagnante(carteJouee)) {
                 carteGagnante = carteJouee;
                 joueurGagnant = joueur;
+                System.out.println(
+                        "Le " + joueur.nomJoueur + " qui est " + joueur.roleJoueur + ", est gagnant.");
             }
         }
+        for (Carte i : cartesJouees) {
+            System.out.println("cartes jouees: " + i.getNom());
+        }
         // À la fin du pli, attribuer le pli à l'équipe gagnante
-        if (joueurGagnant.roleJoueur == "Attaquant") {
+        if ("Attaquant".equals(joueurGagnant.roleJoueur)) {
             Manche.pliAttaque.addAll(cartesJouees);
+            System.out.println("ajout des cartes au pli attaquant");
         } else {
             Manche.pliDefense.addAll(cartesJouees);
+            System.out.println("ajout des cartes au pli défenseur");
         }
     }
 
     private boolean estCarteGagnante(Carte carte) {
         // Si la première carte du pli est jouée, elle définit la couleur demandée et
         // gagne par défaut
+        if (carte.nomCarte.equals("Excuse")) {
+            return false;
+        }
         if (carteGagnante == null) {
             return true;
         }
@@ -105,5 +121,4 @@ public class Pli {
         return joueurs;
     }
 
-    
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class Manche {
 
@@ -38,6 +39,10 @@ public class Manche {
     public static List<Carte> pliDefense = new ArrayList<>();
     public static List<Carte> pliAttaque = new ArrayList<>();
     Pli pli;
+    String[] couleurVerifiees = new String[4];
+    int nombrePointsTotal;
+    int scoreARealiser;
+    int countBoutAttaquant;
 
     public Manche(Joueur j1, Joueur j2, Joueur j3, Joueur j4, List<Carte> dM, int tC) {
         joueur1 = j1;
@@ -61,28 +66,20 @@ public class Manche {
                 joueur2.mainJoueur.clear();
                 joueur3.mainJoueur.clear();
                 joueur4.mainJoueur.clear();
+                packetChien.clear();
                 distributionQuatreJoueurs();
-                for (int i = 0; i < joueur1.mainJoueur.size(); i++) {
-                    System.out.println(joueur1.mainJoueur.get(i).getNom());
-                }
                 System.out.println("fin de distribution");
-                System.out.println();
                 misesJoueurs();
-                System.out.println(misesPartie);
             }
         } else {
             while (misesPartie.get(joueur1) == 0 && misesPartie.get(joueur2) == 0 && misesPartie.get(joueur3) == 0) {
                 joueur1.mainJoueur.clear();
                 joueur2.mainJoueur.clear();
                 joueur3.mainJoueur.clear();
+                packetChien.clear();
                 distributionTroisJoueurs();
-                for (int i = 0; i < joueur1.mainJoueur.size(); i++) {
-                    System.out.println(joueur1.mainJoueur.get(i).getNom());
-                }
                 System.out.println("fin de distribution");
-                System.out.println();
                 misesJoueurs();
-                System.out.println(misesPartie);
             }
         }
         int maxValue = 0;
@@ -92,18 +89,35 @@ public class Manche {
                 attaquant = i;
             }
         }
+        countBoutAttaquant = nombreCartesSpeciales(attaquant, attaquant.mainJoueur)[0];
+        switch (countBoutAttaquant) {
+            case 0:
+                scoreARealiser = 56;
+                break;
+            case 1:
+                scoreARealiser = 51;
+                break;
+            case 2:
+                scoreARealiser = 41;
+                break;
+            case 3:
+                scoreARealiser = 36;
+                break;
+            default:
+                break;
+        }
+        pliAttaque.clear();
+        pliDefense.clear();
         gestionDuChien();
-        // lancementDesPlis();
-        // calculPointsDeManche();
+        lancementDesPlis();
+        calculPointsDeManche(pliAttaque);
     }
 
     public void lancementDesPlis() {
         while (!joueur1.mainJoueur.isEmpty()) {
             System.out.println(joueur1.mainJoueur.size());
             new Pli(joueurs);
-            System.out.println("check");
         }
-        System.out.println("finished?");
     }
 
     public void misesJoueurs() {
@@ -485,43 +499,51 @@ public class Manche {
         }
     }
 
-    public void calculPointsDeManche() {
-
-    }
-
     public void gestionDuChien() {
-        for (Joueur i : joueurs) {
-            if (i != attaquant) {
-                Collections.sort(i.mainJoueur, Comparator.comparing(Carte::getType));
-                Collections.sort(i.mainJoueur, Comparator.comparing(Carte::getValeur));
+        if (attaquant.miseJoueur.equals("Petite") || attaquant.miseJoueur.equals("Garde")) {
+            for (Joueur i : joueurs) {
+                if (i != attaquant) {
+                    Collections.sort(i.mainJoueur, Comparator.comparing(Carte::getValeur));
+                    Collections.sort(i.mainJoueur, Comparator.comparing(Carte::getType));
+                }
+                if (i == attaquant) {
+                    i.roleJoueur = "Attaquant";
+                    i.mainJoueur.addAll(packetChien);
+                    Collections.sort(i.mainJoueur, Comparator.comparing(Carte::getValeur));
+                    Collections.sort(i.mainJoueur, Comparator.comparing(Carte::getType));
+                    getCouleursDansMain(i);
+                    i.mainJoueur = defausserCartes(i);
+                }
             }
-            if (i == attaquant) {
-                i.roleJoueur = "Attaquant";
-                i.mainJoueur.addAll(packetChien);
-                Collections.sort(i.mainJoueur, Comparator.comparing(Carte::getType));
-                Collections.sort(i.mainJoueur, Comparator.comparing(Carte::getValeur));
-                getCouleursDansMain(i);
-                defausserCartes(i);
-            }
+        } else if (attaquant.miseJoueur.equals("Garde sans")) {
+            pliAttaque.addAll(packetChien);
+        } else if (attaquant.miseJoueur.equals("Garde contre")) {
+            pliDefense.addAll(packetChien);
         }
     }
 
     public void getCouleursDansMain(Joueur joueur) {
-        int k = 0;
+        int t = 0;
+        int p = 0;
+        int c = 0;
+        int c2 = 0;
         for (Carte i : joueur.mainJoueur) {
-            joueur.nombreCarteCouleurDansMain.put(i.typeCarte, k++);
             switch (i.typeCarte) {
                 case "Trefle":
                     joueur.treflesDansMain.put(i.valeurCarte, true);
+                    joueur.nombreCarteCouleurDansMain.put(i.typeCarte, t++);
                     break;
                 case "Pique":
                     joueur.piquesDansMain.put(i.valeurCarte, true);
+                    joueur.nombreCarteCouleurDansMain.put(i.typeCarte, p++);
                     break;
                 case "Coeur":
-                    joueur.coeurDansMain.put(i.valeurCarte, true);
+                    joueur.coeursDansMain.put(i.valeurCarte, true);
+                    joueur.nombreCarteCouleurDansMain.put(i.typeCarte, c++);
                     break;
                 case "Carreau":
                     joueur.carreauxDansMain.put(i.valeurCarte, true);
+                    joueur.nombreCarteCouleurDansMain.put(i.typeCarte, c2++);
                     break;
                 default:
                     break;
@@ -529,81 +551,268 @@ public class Manche {
         }
     }
 
-    public void defausserCartes(Joueur joueur) {
-        List<Map.Entry<String, Integer>> listeDeTri = new ArrayList<>(joueur.nombreCarteCouleurDansMain.entrySet());
-        // Sort the list based on values (quantities)
-        listeDeTri.sort(Map.Entry.comparingByValue());
-        // Create an array of card types ordered by occurrences
-        String[] typeCartesOrdonne = listeDeTri.stream()
-                .map((Map.Entry<String, Integer> entry) -> entry.getKey())
-                .toArray(String[]::new);
-        List<Carte> main = joueur.mainJoueur;
-        for (int i = 0; i < main.size(); i++) {
-            if (!main.get(i).typeCarte.equals("Atout") && !main.get(i).typeCarte.equals("Excuse")
-                    && main.get(i).valeurCarte != 14) {
-                if (main.get(i).typeCarte.equals(typeCartesOrdonne[0])
-                        && joueur.nombreCarteCouleurDansMain.get(main.get(i).typeCarte) < packetChien.size()) {
-                    if (main.get(i).valeurCarte <= 10) {
-                        pliAttaque.add(main.get(i));
-                        joueur.mainJoueur.remove(i);
-                    } else {
-                        switch (main.get(i).valeurCarte) {
-                            case 11:
-                                switch (main.get(i).typeCarte) {
-                                    case "Trefle":
-                                        break;
-                                    case "Pique":
-                                        break;
-                                    case "Ceur":
-                                        break;
-                                    case "Carreau":
-                                        break;
-                                    default:
-                                        break;
-                                }
-                                break;
-                            case 12:
-                                switch (main.get(i).typeCarte) {
-                                    case "Trefle":
-                                        break;
-                                    case "Pique":
-                                        break;
-                                    case "Ceur":
-                                        break;
-                                    case "Carreau":
-                                        break;
-                                    default:
-                                        break;
-                                }
-                                break;
-                            case 13:
-                                switch (main.get(i).typeCarte) {
-                                    case "Trefle":
-                                        break;
-                                    case "Pique":
-                                        break;
-                                    case "Ceur":
-                                        break;
-                                    case "Carreau":
-                                        break;
-                                    default:
-                                        break;
-                                }
-                                break;
-
-                        }
-
+    public List<Carte> defausserCartes(Joueur attaquant) {
+        List<String> typeCartesOrdonne = attaquant.nombreCarteCouleurDansMain.entrySet().stream()
+                .filter(entry -> !entry.getKey().equals("Atout"))
+                .sorted(Comparator.comparingInt(Map.Entry::getValue))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        List<Carte> mainAttaquant = attaquant.mainJoueur;
+        int i = 0;
+        boolean couleurPassee = false;
+        int nombrePassages = 0;
+        String couleurActuelle = mainAttaquant.get(i).getType();
+        while (pliAttaque.size() != packetChien.size()) {
+            if (i < mainAttaquant.size()) {
+                couleurActuelle = mainAttaquant.get(i).getType();
+            }
+            if (couleurPassee && !mainAttaquant.get(i - 1).getType().equals(typeCartesOrdonne.get(0))) {
+                typeCartesOrdonne.set(0, typeCartesOrdonne.get(1));
+                typeCartesOrdonne.set(1, typeCartesOrdonne.get(2));
+                typeCartesOrdonne.set(2, typeCartesOrdonne.get(3));
+                couleurPassee = false;
+                nombrePassages++;
+                i = 0;
+                continue;
+            }
+            if (i < mainAttaquant.size() && !couleurActuelle.equals("Atout")
+                    && mainAttaquant.get(i).valeurCarte != 14
+                    && couleurActuelle.equals(typeCartesOrdonne.get(0))
+                    && pliAttaque.size() < packetChien.size()) {
+                couleurPassee = true;
+                if (mainAttaquant.get(i).valeurCarte > 10) {
+                    switch (mainAttaquant.get(i).valeurCarte) {
+                        case 11:
+                            switch (couleurActuelle) {
+                                case "Trefle":
+                                    if (!(attaquant.treflesDansMain.get(12) && attaquant.treflesDansMain.get(13)
+                                            && attaquant.treflesDansMain.get(14))) {
+                                        pliAttaque.add(mainAttaquant.get(i));
+                                        mainAttaquant.remove(i);
+                                        continue;
+                                    }
+                                    break;
+                                case "Pique":
+                                    if (!(attaquant.piquesDansMain.get(12) && attaquant.piquesDansMain.get(13)
+                                            && attaquant.piquesDansMain.get(14))) {
+                                        pliAttaque.add(mainAttaquant.get(i));
+                                        mainAttaquant.remove(i);
+                                        continue;
+                                    }
+                                    break;
+                                case "Coeur":
+                                    if (!(attaquant.coeursDansMain.get(12) && attaquant.coeursDansMain.get(13)
+                                            && attaquant.coeursDansMain.get(14))) {
+                                        pliAttaque.add(mainAttaquant.get(i));
+                                        mainAttaquant.remove(i);
+                                        continue;
+                                    }
+                                    break;
+                                case "Carreau":
+                                    if (!(attaquant.carreauxDansMain.get(12) && attaquant.carreauxDansMain.get(13)
+                                            && attaquant.carreauxDansMain.get(14))) {
+                                        pliAttaque.add(mainAttaquant.get(i));
+                                        mainAttaquant.remove(i);
+                                        continue;
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                            break;
+                        case 12:
+                            switch (couleurActuelle) {
+                                case "Trefle":
+                                    if (!(attaquant.treflesDansMain.get(13)
+                                            && attaquant.treflesDansMain.get(14))) {
+                                        pliAttaque.add(mainAttaquant.get(i));
+                                        mainAttaquant.remove(i);
+                                        continue;
+                                    }
+                                    break;
+                                case "Pique":
+                                    if (!(attaquant.piquesDansMain.get(13)
+                                            && attaquant.piquesDansMain.get(14))) {
+                                        pliAttaque.add(mainAttaquant.get(i));
+                                        mainAttaquant.remove(i);
+                                        continue;
+                                    }
+                                    break;
+                                case "Coeur":
+                                    if (!(attaquant.coeursDansMain.get(13)
+                                            && attaquant.coeursDansMain.get(14))) {
+                                        pliAttaque.add(mainAttaquant.get(i));
+                                        mainAttaquant.remove(i);
+                                        continue;
+                                    }
+                                    break;
+                                case "Carreau":
+                                    if (!(attaquant.carreauxDansMain.get(13)
+                                            && attaquant.carreauxDansMain.get(14))) {
+                                        pliAttaque.add(mainAttaquant.get(i));
+                                        mainAttaquant.remove(i);
+                                        continue;
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                            break;
+                        case 13:
+                            switch (couleurActuelle) {
+                                case "Trefle":
+                                    if (!attaquant.treflesDansMain.get(14)) {
+                                        pliAttaque.add(mainAttaquant.get(i));
+                                        mainAttaquant.remove(i);
+                                        continue;
+                                    }
+                                    break;
+                                case "Pique":
+                                    if (!attaquant.piquesDansMain.get(14)) {
+                                        pliAttaque.add(mainAttaquant.get(i));
+                                        mainAttaquant.remove(i);
+                                        continue;
+                                    }
+                                    break;
+                                case "Coeur":
+                                    if (!attaquant.coeursDansMain.get(14)) {
+                                        pliAttaque.add(mainAttaquant.get(i));
+                                        mainAttaquant.remove(i);
+                                        continue;
+                                    }
+                                    break;
+                                case "Carreau":
+                                    if (!attaquant.carreauxDansMain.get(14)) {
+                                        pliAttaque.add(mainAttaquant.get(i));
+                                        mainAttaquant.remove(i);
+                                        continue;
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                            break;
+                        default:
+                            break;
                     }
+                } else {
+                    pliAttaque.add(mainAttaquant.get(i));
+                    mainAttaquant.remove(i);
+                    continue;
+                }
 
+            }
+            if (nombrePassages == 4) {
+                i = 0;
+                for (;;) {
+                    if (!mainAttaquant.get(i).typeCarte.equals("Atout")
+                            && !mainAttaquant.get(i).typeCarte.equals("Excuse")
+                            && mainAttaquant.get(i).valeurCarte < 14) {
+                        pliAttaque.add(mainAttaquant.get(i));
+                        mainAttaquant.remove(i);
+                        if (packetChien.size() == pliAttaque.size()) {
+                            break;
+                        }
+                        continue;
+                    }
+                    i++;
                 }
             }
-            if (i >= 1 && main.get(i).typeCarte.equals(main.get(i - 1).typeCarte)) {
-                typeCartesOrdonne[0] = typeCartesOrdonne[1];
-                typeCartesOrdonne[1] = typeCartesOrdonne[2];
-                typeCartesOrdonne[2] = typeCartesOrdonne[3];
+            i++;
+        }
+        return mainAttaquant;
+    }
+
+    public void calculPointsDeManche(List<Carte> pliAttaque) {
+        List<Carte> pliComptagePoints = new ArrayList<>();
+        int taillePliAttaque = pliAttaque.size();
+        while (pliComptagePoints.size() < taillePliAttaque) {
+            int nombreDe1 = 0;
+            int nombreDeSpeciales = 0;
+            for (Carte i : pliAttaque) {
+                if (i.getPoints() == 1) {
+                    nombreDe1++;
+                } else {
+                    nombreDeSpeciales++;
+                }
             }
-            if (pliAttaque.size() == packetChien.size()) {
+            if (nombreDe1 == 0 || nombreDeSpeciales == 0) {
+                for (Carte i : pliAttaque) {
+                    pliComptagePoints.add(i);
+                }
+            }
+            for (int i = 0; i < pliAttaque.size(); i++) {
+                if (i > 0 && (pliAttaque.get(i - 1).getPoints() == 1 || pliAttaque.get(i).getPoints() == 1)
+                        && pliAttaque.get(i - 1).getPoints() != pliAttaque.get(i).getPoints()) {
+                    pliComptagePoints.add(pliAttaque.get(i));
+                }
+            }
+            for (Carte i : pliComptagePoints) {
+                for (Carte j : pliAttaque) {
+                    if (i == j) {
+                        pliAttaque.remove(i);
+                        break;
+                    }
+                }
+            }
+        }
+        comptageDesPoints(pliComptagePoints);
+    }
+
+    public void comptageDesPoints(List<Carte> pliComptagePoints) {
+        int petitAuBout = 0;
+        int bonusPoignee = 0;
+        int bonusChelem = 0;
+        int difference = 0;
+        int mise = 0;
+        int victoireDefense = 1;
+        int nombrePointsPliAttaquant = 0;
+        switch (attaquant.miseJoueur) {
+            case "Garde Contre":
+                System.out.println("garde contre");
+                mise = 6;
                 break;
+            case "Garde Sans":
+                System.out.println("garde sans");
+                mise = 4;
+                break;
+            case "Garde":
+                System.out.println("garde");
+                mise = 2;
+                break;
+            case "Petite":
+                System.out.println("petite");
+                mise = 1;
+                break;
+            default:
+                mise = 1;
+                break;
+        }
+        for (int i = 0; i < pliComptagePoints.size(); i += 2) {
+            int max = pliComptagePoints.get(i).getPoints();
+            if (i < pliComptagePoints.size() - 1 && (max < pliComptagePoints.get(i + 1).getPoints())) {
+                max = pliComptagePoints.get(i + 1).getPoints();
+            }
+            nombrePointsPliAttaquant += max;
+        }
+        System.out.println("nombre de points dans le pli attaquant: " + nombrePointsPliAttaquant);
+        System.out.println("Score à réaliser: " + scoreARealiser);
+        difference = Math.abs(nombrePointsPliAttaquant - scoreARealiser);
+        System.out.println("Différence de score: " + difference);
+        if (nombrePointsPliAttaquant >= scoreARealiser) {
+            victoireDefense = -1;
+            System.out.println("L'attaquant, qui est le" + attaquant.nomJoueur + "gagne!");
+        } else {
+            System.out.println("L'attaquant, qui est le" + attaquant.nomJoueur + " chute!");
+        }
+        nombrePointsTotal = ((25 + difference + petitAuBout) * mise) + bonusPoignee
+                + bonusChelem;
+        System.out.println("nombre de points total: " + nombrePointsTotal);
+        for (Joueur i : joueurs) {
+            if (i != attaquant) {
+                i.pointsJoueur += victoireDefense * nombrePointsTotal;
+            } else {
+                attaquant.pointsJoueur += -1 * victoireDefense * nombrePointsTotal * (joueurs.size() - 1);
             }
         }
     }

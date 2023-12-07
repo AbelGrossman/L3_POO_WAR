@@ -19,7 +19,8 @@ public class Joueur {
     Map<Integer, Boolean> treflesDansMain = new HashMap<>();
     Map<Integer, Boolean> carreauxDansMain = new HashMap<>();
     Map<Integer, Boolean> piquesDansMain = new HashMap<>();
-    Map<Integer, Boolean> coeurDansMain = new HashMap<>();
+    Map<Integer, Boolean> coeursDansMain = new HashMap<>();
+    Random rand = new Random();
 
     public Joueur(String nom, List<Carte> main, int points, int niveau) {
         nomJoueur = nom;
@@ -30,12 +31,13 @@ public class Joueur {
             treflesDansMain.put(i, false);
             carreauxDansMain.put(i, false);
             piquesDansMain.put(i, false);
-            coeurDansMain.put(i, false);
+            coeursDansMain.put(i, false);
         }
     }
 
     // Le joueur joue une carte
     public Carte jouerCarte(String couleurDemandee, Carte carteGagnante) {
+        nombreAtoutsSups = 0;
         calculateurDeType(carteGagnante);
         switch (niveauJoueur) {
             case 1:
@@ -52,13 +54,11 @@ public class Joueur {
 
     // Stratégie aléatoire pour le bot "dumb"
     private Carte jouerCarteAuHasard(String couleurDemandee, Carte carteGagnante) {
-        Random rand = new Random();
         Carte carteJouee = null;
-
-        while (true) {
+        for (;;) {
             carteJouee = mainJoueur.get(rand.nextInt(mainJoueur.size()));
-
             if (isValidCard(carteJouee, couleurDemandee, carteGagnante)) {
+                System.out.println("Le " + nomJoueur + " joue: " + carteJouee.nomCarte);
                 break;
             }
         }
@@ -69,31 +69,43 @@ public class Joueur {
 
     private boolean isValidCard(Carte carteJouee, String couleurDemandee, Carte carteGagnante) {
         if (couleurDemandee != null) {
+            if (carteGagnante.typeCarte.equals("Excuse") || carteJouee.typeCarte.equals("Excuse")) {
+                System.out.println("case 1");
+                return true;
+            }
             if (carteJouee.typeCarte.equals(couleurDemandee) && !carteJouee.typeCarte.equals("Atout")) {
+                System.out.println("case 2");
+                return true;
+            }
+
+            if (carteJouee.typeCarte.equals("Atout") && !carteJouee.typeCarte.equals(couleurDemandee)
+                    && nombreCarteCouleurDansMain.get(couleurDemandee) == 0) {
+                System.out.println("case 3");
                 return true;
             }
 
             if (carteJouee.typeCarte.equals(couleurDemandee) && carteJouee.typeCarte.equals("Atout")
-                    && carteJouee.valeurCarte > carteGagnante.valeurCarte) {
-                return true;
-            }
-
-            if (carteJouee.typeCarte.equals(couleurDemandee) && carteJouee.typeCarte.equals("Atout")
-                    && nombreAtoutsSups == 0 && carteJouee.valeurCarte < carteGagnante.valeurCarte) {
+                    && (carteJouee.valeurCarte > carteGagnante.valeurCarte
+                            || nombreAtoutsSups == 0)) {
+                System.out.println("case 4");
                 return true;
             }
 
             if (!carteJouee.typeCarte.equals(couleurDemandee) && couleurDemandee.equals("Atout")
-                    && nombreCarteCouleurDansMain.get("Atout") == 0) {
-                return true;
-            }
-
-            if (!carteJouee.typeCarte.equals(couleurDemandee) && !couleurDemandee.equals("Atout")
-                    && nombreCarteCouleurDansMain.get("Atout") == 0
                     && nombreCarteCouleurDansMain.get(couleurDemandee) == 0) {
+                System.out.println("case 5");
                 return true;
             }
-        } else {
+            if (!couleurDemandee.equals("Atout") && (!carteJouee.typeCarte.equals(couleurDemandee)
+                    && nombreCarteCouleurDansMain.get("Atout") == 0
+                    && nombreCarteCouleurDansMain.get(couleurDemandee) == 0)) {
+                System.out.println("case 6");
+                return true;
+
+            }
+        } else
+
+        {
             // Handle the case where couleurDemandee is null
             return true; // Assuming any card is valid in this case
         }
@@ -122,13 +134,19 @@ public class Joueur {
     }
 
     public void calculateurDeType(Carte carteGagnante) {
-        int j = 0;
-        nombreCarteCouleurDansMain.clear();
+        nombreCarteCouleurDansMain.put("Trefle", 0);
+        nombreCarteCouleurDansMain.put("Pique", 0);
+        nombreCarteCouleurDansMain.put("Coeur", 0);
+        nombreCarteCouleurDansMain.put("Carreau", 0);
+        nombreCarteCouleurDansMain.put("Atout", 0);
+
         for (Carte i : mainJoueur) {
-            nombreCarteCouleurDansMain.put(i.typeCarte, j++);
-            if (carteGagnante != null && i.typeCarte.equals("Atout") && carteGagnante.typeCarte.equals("Atout")
-                    && (i.valeurCarte > carteGagnante.valeurCarte)) {
-                nombreAtoutsSups++;
+            if (!i.typeCarte.equals("Excuse")) {
+                nombreCarteCouleurDansMain.put(i.typeCarte, nombreCarteCouleurDansMain.get(i.typeCarte) + 1);
+                if (carteGagnante != null && i.typeCarte.equals("Atout") && carteGagnante.typeCarte.equals("Atout")
+                        && (i.valeurCarte > carteGagnante.valeurCarte)) {
+                    nombreAtoutsSups++;
+                }
             }
         }
     }
