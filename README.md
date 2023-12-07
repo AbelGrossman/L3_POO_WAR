@@ -45,11 +45,11 @@ On peut également passer son tour.
 
 Celui qui "remporte" les enchères devient l'Attaquant qui jouera contre les autres joueurs (Défenseurs).
 
-Le joueur à la gauche du Donneur (celui qui a distribué les cartes) est le premier à miser.
+Le joueur à la droite du Donneur (celui qui a distribué les cartes) est le premier à miser.
 
 Les enchères se terminent quand le tour est complété et que chaque joueur a misé ou passé, ou quand un joueur à choisi de faire une Garde contre (car il est impossible de miser plus haut).
 
-Si tous les joueurs passent, on passe à la prochaine manche et le nouveau Donneur est le joueur à la gauche du donneur actuel, d'où l'importance de ne pas encore ordonner ses mains (le jeu de Tarot n'est jamais mélangé).
+Si tous les joueurs passent, on passe à la prochaine manche et le nouveau Donneur est le joueur à la droite du donneur actuel, d'où l'importance de ne pas encore ordonner ses mains (le jeu de Tarot n'est jamais mélangé).
 
 Les joueurs peuvent maintenant ordonner leurs mains.
 
@@ -125,7 +125,7 @@ Score=(25+Différence+PetitAuBout)*Mise
 
 Total=Score+Poignée+Chelem
 
-La Différence est l’écart de points entre la somme calculée et la valeur requise. 
+La Différence est l’écart en valeur absolue de points entre la somme calculée et la valeur requise. Cet ecart est donc toujours positif.
 
 La Mise dépend de l’enchère. Elle vaut 1 pour une Petite, 2 pour une Garde, 4 pour une Garde Sans et 6 pour une Garde Contre.
 
@@ -157,7 +157,7 @@ A la fin de chaque manche, le score de manche de chaque joueur s’additionne à
 Une partie se termine après qu’un nombre prédéfini de manches aient été effectuées.
 La personne ayant le plus grand score de partie remporte la partie.
 
-## règles supplémentaires
+## Règles supplémentaires
 
 * Le Donneur peux choisir 3 types de chiens: chiuaua, bulldog et labrador. A 3 joueurs: 3 cartes, 6 cartes et 9 cartes. A 4 joueurs: 2 cartes, 6 cartes et 10 cartes.
 * S'il y un pli avec que des aouts, les joueurs donnent deux cartes au hasard au joueur de droite.
