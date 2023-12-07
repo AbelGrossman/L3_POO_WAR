@@ -38,11 +38,11 @@ public class Manche {
     Joueur attaquant;
     public static List<Carte> pliDefense = new ArrayList<>();
     public static List<Carte> pliAttaque = new ArrayList<>();
-    Pli pli;
     String[] couleurVerifiees = new String[4];
     int nombrePointsTotal;
     int scoreARealiser;
     int countBoutAttaquant;
+    Boolean excusePassee = false;
 
     public Manche(Joueur j1, Joueur j2, Joueur j3, Joueur j4, List<Carte> dM, int tC) {
         joueur1 = j1;
@@ -52,36 +52,30 @@ public class Manche {
         misesPartie.put(joueur1, 0);
         misesPartie.put(joueur2, 0);
         misesPartie.put(joueur3, 0);
+        misesPartie.put(joueur4, 0);
         joueurs.add(joueur2);
         joueurs.add(joueur3);
         joueurs.add(joueur1);
         deckMelange = dM;
         typeChien = tC;
         if (joueur4 != null) {
-            misesPartie.put(joueur4, 0);
             joueurs.add(joueur4);
-            while (misesPartie.get(joueur1) == 0 && misesPartie.get(joueur2) == 0 && misesPartie.get(joueur3) == 0
-                    && misesPartie.get(joueur4) == 0) {
-                joueur1.mainJoueur.clear();
-                joueur2.mainJoueur.clear();
-                joueur3.mainJoueur.clear();
-                joueur4.mainJoueur.clear();
-                packetChien.clear();
-                distributionQuatreJoueurs();
-                System.out.println("fin de distribution");
-                misesJoueurs();
-            }
+            distributionQuatreJoueurs();
+            System.out.println("fin de distribution");
+            misesJoueurs();
         } else {
-            while (misesPartie.get(joueur1) == 0 && misesPartie.get(joueur2) == 0 && misesPartie.get(joueur3) == 0) {
-                joueur1.mainJoueur.clear();
-                joueur2.mainJoueur.clear();
-                joueur3.mainJoueur.clear();
-                packetChien.clear();
-                distributionTroisJoueurs();
-                System.out.println("fin de distribution");
-                misesJoueurs();
-            }
+            distributionTroisJoueurs();
+            System.out.println("fin de distribution");
+            misesJoueurs();
         }
+        if (!(misesPartie.get(joueur1) == 0 && misesPartie.get(joueur2) == 0
+                && misesPartie.get(joueur3) == 0 && misesPartie.get(joueur4) == 0)) {
+            suiteDeManche();
+        }
+
+    }
+
+    public void suiteDeManche() {
         int maxValue = 0;
         for (Joueur i : joueurs) {
             if (misesPartie.get(i) > maxValue) {
@@ -89,6 +83,7 @@ public class Manche {
                 attaquant = i;
             }
         }
+        System.out.println("mise de l'attaquant: " + attaquant.miseJoueur);
         countBoutAttaquant = nombreCartesSpeciales(attaquant, attaquant.mainJoueur)[0];
         switch (countBoutAttaquant) {
             case 0:
@@ -114,10 +109,60 @@ public class Manche {
     }
 
     public void lancementDesPlis() {
+        List<Joueur> swapJoueurs = joueurs;
         while (!joueur1.mainJoueur.isEmpty()) {
             System.out.println(joueur1.mainJoueur.size());
-            new Pli(joueurs);
+            Pli pli = new Pli(joueurs, excusePassee);
+            excusePassee=pli.excusePassee;
+            for (int i = 0; i < joueurs.size(); i++) {
+                if (joueurs.get(i) == pli.joueurGagnant) {
+                    Joueur swap1;
+                    Joueur swap2;
+                    Joueur swap3;
+                    switch (i) {
+                        case 1:
+                            swap1 = joueurs.get(0);
+                            if (joueur4 != null) {
+                                joueurs.set(0, joueurs.get(1));
+                                joueurs.set(1, joueurs.get(2));
+                                joueurs.set(2, joueurs.get(3));
+                                joueurs.set(3, swap1);
+                            } else {
+                                joueurs.set(0, joueurs.get(1));
+                                joueurs.set(1, joueurs.get(2));
+                                joueurs.set(2, swap1);
+                            }
+                            break;
+                        case 2:
+                            swap1 = joueurs.get(0);
+                            swap2 = joueurs.get(1);
+                            if (joueur4 != null) {
+                                joueurs.set(0, joueurs.get(2));
+                                joueurs.set(1, joueurs.get(3));
+                                joueurs.set(2, swap1);
+                                joueurs.set(3, swap2);
+                            } else {
+                                joueurs.set(0, joueurs.get(2));
+                                joueurs.set(1, swap1);
+                                joueurs.set(2, swap2);
+                            }
+                            break;
+                        case 3:
+                            swap1 = joueurs.get(0);
+                            swap2 = joueurs.get(1);
+                            swap3 = joueurs.get(2);
+                            joueurs.set(0, joueurs.get(3));
+                            joueurs.set(1, swap1);
+                            joueurs.set(2, swap2);
+                            joueurs.set(3, swap3);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
         }
+        joueurs = swapJoueurs;
     }
 
     public void misesJoueurs() {
@@ -513,12 +558,20 @@ public class Manche {
                     Collections.sort(i.mainJoueur, Comparator.comparing(Carte::getType));
                     getCouleursDansMain(i);
                     i.mainJoueur = defausserCartes(i);
+                } else {
+                    i.roleJoueur = "Defenseur";
                 }
             }
-        } else if (attaquant.miseJoueur.equals("Garde sans")) {
+            System.out.println("taille pli attaquant après gestion du chien: " + pliAttaque.size() + ". Défense: "
+                    + pliDefense.size());
+        } else if (attaquant.miseJoueur.equals("Garde Sans")) {
             pliAttaque.addAll(packetChien);
-        } else if (attaquant.miseJoueur.equals("Garde contre")) {
+            System.out.println("taille pli attaquant après gestion du chien: " + pliAttaque.size() + ". Défense: "
+                    + pliDefense.size());
+        } else if (attaquant.miseJoueur.equals("Garde Contre")) {
             pliDefense.addAll(packetChien);
+            System.out.println("taille pli attaquant après gestion du chien: " + pliAttaque.size() + ". Défense: "
+                    + pliDefense.size());
         }
     }
 
@@ -801,9 +854,9 @@ public class Manche {
         System.out.println("Différence de score: " + difference);
         if (nombrePointsPliAttaquant >= scoreARealiser) {
             victoireDefense = -1;
-            System.out.println("L'attaquant, qui est le" + attaquant.nomJoueur + "gagne!");
+            System.out.println("L'attaquant, qui est le " + attaquant.nomJoueur + ", gagne!");
         } else {
-            System.out.println("L'attaquant, qui est le" + attaquant.nomJoueur + " chute!");
+            System.out.println("L'attaquant, qui est le " + attaquant.nomJoueur + ", chute!");
         }
         nombrePointsTotal = ((25 + difference + petitAuBout) * mise) + bonusPoignee
                 + bonusChelem;
