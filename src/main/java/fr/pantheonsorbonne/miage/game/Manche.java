@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 
 public class Manche {
@@ -33,7 +34,6 @@ public class Manche {
         }
     };
     Map<Joueur, Integer> misesPartie = new HashMap<>();
-
     Joueur attaquant;
     public static List<Carte> pliDefense = new ArrayList<>();
     public static List<Carte> pliAttaque = new ArrayList<>();
@@ -47,21 +47,43 @@ public class Manche {
         misesPartie.put(joueur1, 0);
         misesPartie.put(joueur2, 0);
         misesPartie.put(joueur3, 0);
-        misesPartie.put(joueur4, 0);
         joueurs.add(joueur2);
         joueurs.add(joueur3);
-        joueurs.add(joueur4);
         joueurs.add(joueur1);
-        joueur1.miseJoueur = null;
-        joueur2.miseJoueur = null;
-        joueur3.miseJoueur = null;
-        joueur4.miseJoueur = null;
         deckMelange = dM;
         typeChien = tC;
-        while (misesPartie.get(joueur1) == 0 && misesPartie.get(joueur2) == 0 && misesPartie.get(joueur3) == 0
-                && misesPartie.get(joueur4) == 0) {
-            distributionQuatreJoueurs();
-            misesJoueurs();
+        if (joueur4 != null) {
+            misesPartie.put(joueur4, 0);
+            joueurs.add(joueur4);
+            while (misesPartie.get(joueur1) == 0 && misesPartie.get(joueur2) == 0 && misesPartie.get(joueur3) == 0
+                    && misesPartie.get(joueur4) == 0) {
+                joueur1.mainJoueur.clear();
+                joueur2.mainJoueur.clear();
+                joueur3.mainJoueur.clear();
+                joueur4.mainJoueur.clear();
+                distributionQuatreJoueurs();
+                for (int i = 0; i < joueur1.mainJoueur.size(); i++) {
+                    System.out.println(joueur1.mainJoueur.get(i).getNom());
+                }
+                System.out.println("fin de distribution");
+                System.out.println();
+                misesJoueurs();
+                System.out.println(misesPartie);
+            }
+        } else {
+            while (misesPartie.get(joueur1) == 0 && misesPartie.get(joueur2) == 0 && misesPartie.get(joueur3) == 0) {
+                joueur1.mainJoueur.clear();
+                joueur2.mainJoueur.clear();
+                joueur3.mainJoueur.clear();
+                distributionTroisJoueurs();
+                for (int i = 0; i < joueur1.mainJoueur.size(); i++) {
+                    System.out.println(joueur1.mainJoueur.get(i).getNom());
+                }
+                System.out.println("fin de distribution");
+                System.out.println();
+                misesJoueurs();
+                System.out.println(misesPartie);
+            }
         }
         int maxValue = 0;
         for (Joueur i : joueurs) {
@@ -70,55 +92,7 @@ public class Manche {
                 attaquant = i;
             }
         }
-        for (Joueur i : joueurs) {
-            if (i == attaquant) {
-                i.roleJoueur = "Attaquant";
-            }
-        }
-        lancementDesPlis();
-        calculPointsDeManche();
-    }
-
-    public Manche(Joueur j1, Joueur j2, Joueur j3, List<Carte> dM, int tC) {
-        joueur1 = j1;
-        joueur2 = j2;
-        joueur3 = j3;
-        misesPartie.put(joueur1, 0);
-        misesPartie.put(joueur2, 0);
-        misesPartie.put(joueur3, 0);
-        joueurs.add(joueur2);
-        joueurs.add(joueur3);
-        joueurs.add(joueur1);
-        deckMelange = dM;
-        typeChien = tC;
-        while (misesPartie.get(joueur1) == 0 && misesPartie.get(joueur2) == 0 &&
-                misesPartie.get(joueur3) == 0) {
-            joueur1.mainJoueur.clear();
-            joueur2.mainJoueur.clear();
-            joueur3.mainJoueur.clear();
-            distributionTroisJoueurs();
-            for (int i = 0; i < joueur1.mainJoueur.size(); i++) {
-                System.out.println(joueur1.mainJoueur.get(i).getNom());
-            }
-            System.out.println("fin de distribution");
-            System.out.println();
-            misesJoueurs();
-            System.out.println(misesPartie);
-        }
-
-        int maxValue = 0;
-        for (Joueur i : joueurs) {
-            if (misesPartie.get(i) > maxValue) {
-                maxValue = misesPartie.get(i);
-                attaquant = i;
-            }
-        }
-        for (Joueur i : joueurs) {
-            if (i == attaquant) {
-                i.roleJoueur = "Attaquant";
-            }
-        }
-        recuperationDuChien();
+        gestionDuChien();
         // lancementDesPlis();
         // calculPointsDeManche();
     }
@@ -515,22 +489,122 @@ public class Manche {
 
     }
 
-    public void recuperationDuChien() {
+    public void gestionDuChien() {
         for (Joueur i : joueurs) {
-            if (i.roleJoueur.equals("Attaquant")) {
-                for (Carte j : i.mainJoueur) {
-                    if (j.typeCarte.equals("Atout")){
-                        
-                    }
-                }
+            if (i != attaquant) {
+                Collections.sort(i.mainJoueur, Comparator.comparing(Carte::getType));
+                Collections.sort(i.mainJoueur, Comparator.comparing(Carte::getValeur));
+            }
+            if (i == attaquant) {
+                i.roleJoueur = "Attaquant";
+                i.mainJoueur.addAll(packetChien);
+                Collections.sort(i.mainJoueur, Comparator.comparing(Carte::getType));
+                Collections.sort(i.mainJoueur, Comparator.comparing(Carte::getValeur));
+                getCouleursDansMain(i);
+                defausserCartes(i);
             }
         }
     }
 
+    public void getCouleursDansMain(Joueur joueur) {
+        int k = 0;
+        for (Carte i : joueur.mainJoueur) {
+            joueur.nombreCarteCouleurDansMain.put(i.typeCarte, k++);
+            switch (i.typeCarte) {
+                case "Trefle":
+                    joueur.treflesDansMain.put(i.valeurCarte, true);
+                    break;
+                case "Pique":
+                    joueur.piquesDansMain.put(i.valeurCarte, true);
+                    break;
+                case "Coeur":
+                    joueur.coeurDansMain.put(i.valeurCarte, true);
+                    break;
+                case "Carreau":
+                    joueur.carreauxDansMain.put(i.valeurCarte, true);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    public void defausserCartes(Joueur joueur) {
+        List<Map.Entry<String, Integer>> listeDeTri = new ArrayList<>(joueur.nombreCarteCouleurDansMain.entrySet());
+        // Sort the list based on values (quantities)
+        listeDeTri.sort(Map.Entry.comparingByValue());
+        // Create an array of card types ordered by occurrences
+        String[] typeCartesOrdonne = listeDeTri.stream()
+                .map((Map.Entry<String, Integer> entry) -> entry.getKey())
+                .toArray(String[]::new);
+        List<Carte> main = joueur.mainJoueur;
+        for (int i = 0; i < main.size(); i++) {
+            if (!main.get(i).typeCarte.equals("Atout") && !main.get(i).typeCarte.equals("Excuse")
+                    && main.get(i).valeurCarte != 14) {
+                if (main.get(i).typeCarte.equals(typeCartesOrdonne[0])
+                        && joueur.nombreCarteCouleurDansMain.get(main.get(i).typeCarte) < packetChien.size()) {
+                    if (main.get(i).valeurCarte <= 10) {
+                        pliAttaque.add(main.get(i));
+                        joueur.mainJoueur.remove(i);
+                    } else {
+                        switch (main.get(i).valeurCarte) {
+                            case 11:
+                                switch (main.get(i).typeCarte) {
+                                    case "Trefle":
+                                        break;
+                                    case "Pique":
+                                        break;
+                                    case "Ceur":
+                                        break;
+                                    case "Carreau":
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                break;
+                            case 12:
+                                switch (main.get(i).typeCarte) {
+                                    case "Trefle":
+                                        break;
+                                    case "Pique":
+                                        break;
+                                    case "Ceur":
+                                        break;
+                                    case "Carreau":
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                break;
+                            case 13:
+                                switch (main.get(i).typeCarte) {
+                                    case "Trefle":
+                                        break;
+                                    case "Pique":
+                                        break;
+                                    case "Ceur":
+                                        break;
+                                    case "Carreau":
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                break;
+
+                        }
+
+                    }
+
+                }
+            }
+            if (i >= 1 && main.get(i).typeCarte.equals(main.get(i - 1).typeCarte)) {
+                typeCartesOrdonne[0] = typeCartesOrdonne[1];
+                typeCartesOrdonne[1] = typeCartesOrdonne[2];
+                typeCartesOrdonne[2] = typeCartesOrdonne[3];
+            }
+            if (pliAttaque.size() == packetChien.size()) {
+                break;
+            }
+        }
+    }
 }
-// Test git push etc
-// 2 eme test
-// test abel
-// 2eme test abel
-// 2eme test noam
-// 3eme test abel
