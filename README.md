@@ -53,7 +53,11 @@ Si tous les joueurs passent, on passe à la prochaine manche et le nouveau Donne
 
 Les joueurs peuvent maintenant ordonner leurs mains.
 
-L’Attaquant ajoute à sa main les 6 cartes du chien, puis se défausse de 6 cartes de sa main qu’il ajoute à son deck de plis, faces cachées. Il n’a pas le droit de défausser de bouts, d’atouts ou de Rois (on peut défausser des atouts (sauf bouts) en les montrant s’il n’y a pas assez d’autres cartes).
+Si l'Attaquant a misé Petite ou Garde: L’Attaquant ajoute à sa main les 6 cartes du chien, puis se défausse de 6 cartes de sa main qu’il ajoute à son deck de plis, faces cachées. Il n’a pas le droit de défausser de bouts, d’atouts ou de Rois.
+
+Si l'Attaquant a misé Garde Sans: il ajoute directement les cartes du chien à son deck de plis.
+
+Si l'Attaquant a misé Garde Contre: les cartes sont directement ajoutées au pli de la Defense.
 
 Chaque joueur doit avoir le même nombre de cartes avant le début des plis.
 
