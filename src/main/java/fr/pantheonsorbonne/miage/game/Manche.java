@@ -690,16 +690,20 @@ public class Manche {
     }
 
     public void getCouleursDansMain(Joueur joueur) {
-        int t = 0;
-        int p = 0;
-        int c = 0;
-        int c2 = 0;
+        // Initialise les compteurs pour chaque couleur
+        int t = 0;  //trefle
+        int p = 0;  //pique
+        int c = 0;  //coeur
+        int c2 = 0; //carreau
         for (Carte i : joueur.mainJoueur) {
+            //Switch pour traiter chaque type de carte
             switch (i.typeCarte) {
+                // Enregistre la valeur de la carte dans le dictionnaire des Trefles et met à jour le compteur
                 case "Trefle":
                     joueur.treflesDansMain.put(i.valeurCarte, true);
                     joueur.nombreCarteCouleurDansMain.put(i.typeCarte, t++);
                     break;
+                //meme logique pour pique et ainsi de suite
                 case "Pique":
                     joueur.piquesDansMain.put(i.valeurCarte, true);
                     joueur.nombreCarteCouleurDansMain.put(i.typeCarte, p++);
@@ -717,8 +721,9 @@ public class Manche {
             }
         }
     }
-
+    //Méthode permettant de choisir une liste de carte à défausser suite à la prise du chien
     public List<Carte> defausserCartes(Joueur attaquant) {
+        // Obtient une liste ordonnée des couleurs dans la main de l'attaquant (à l'exception des atouts)
         List<String> typeCartesOrdonne = attaquant.nombreCarteCouleurDansMain.entrySet().stream()
                 .filter(entry -> !entry.getKey().equals("Atout"))
                 .sorted(Comparator.comparingInt(Map.Entry::getValue))
