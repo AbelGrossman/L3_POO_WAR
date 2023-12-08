@@ -18,15 +18,17 @@ public class Manche {
     Joueur joueur4;
     List<Carte> deckMelange;    //deck après le mélange
     int typeChien;
-    List<Carte> packetChien = new ArrayList<>();    //chien
-    //Différent type de prise
+    List<Carte> packetChien = new ArrayList<>();    //Cartes du chien
+
+    //Différents types de prises
     String GC = "Garde Contre";
     String GS = "Garde Sans";
     String G = "Garde";
     String P2 = "Petite";
     String P1 = "Passer";
     List<Joueur> joueurs = new ArrayList<>();
-    //Pour compter point ?
+
+    // Compteur pour chaque type de prise.
     Map<String, Integer> conteurDeMises = new HashMap<String, Integer>() {
         {
             put(GC, 0);
@@ -38,19 +40,22 @@ public class Manche {
     };
     Map<Joueur, Integer> misesPartie = new HashMap<>();
     Joueur attaquant;
-    public static List<Carte> pliDefense = new ArrayList<>();
-    public static List<Carte> pliAttaque = new ArrayList<>();
+    public static List<Carte> pliDefense = new ArrayList<>();   //Plis des defenseurs
+    public static List<Carte> pliAttaque = new ArrayList<>();   //Plis de l'attaquant
     String[] couleurVerifiees = new String[4];
     int nombrePointsTotal;
     int scoreARealiser;
-    int countBoutAttaquant;
-    Boolean excusePassee = false;
-    public static Boolean donALAttaque = false;
-    public static Boolean donALaDefense = false;
-    Boolean excuseALaFin = false;
-    Boolean bonusPetitAuBoutAttaquant = false;
-    Boolean bonusPetitAuBoutDefenseur = false;
+    int countBoutAttaquant;     // Nombre de bouts dans la main de l'attaquant
+    Boolean excusePassee = false;  // Indique si l'Excuse a été jouée pendant un pli
 
+    //Les attributs suivants permettent de gérer les différents cas de l'excuse (don d'une carte si le pli est perdu)
+    public static Boolean donALAttaque = false;  // Indique si le don a été fait à l'attaquant
+    public static Boolean donALaDefense = false;  // Indique si le don a été fait à la défense
+    Boolean excuseALaFin = false;  // Indique si l'excuse a été jouée à la fin de la partie
+    Boolean bonusPetitAuBoutAttaquant = false;  // Indique si le bonus "Petit au bout" a été obtenu par l'attaquant
+    Boolean bonusPetitAuBoutDefenseur = false;  // Indique si le bonus "Petit au bout" a été obtenu par la défense
+
+    // Constructeur de la classe Manche avec les 4 joueurs, le deck mélangé ainsi que le type de chien
     public Manche(Joueur j1, Joueur j2, Joueur j3, Joueur j4, List<Carte> dM, int tC) {
         joueur1 = j1;
         joueur2 = j2;
@@ -65,6 +70,8 @@ public class Manche {
         joueurs.add(joueur1);
         deckMelange = dM;
         typeChien = tC;
+
+        // Distribution des cartes en fonction du nombre de joueurs
         if (joueur4 != null) {
             joueurs.add(joueur4);
             distributionQuatreJoueurs();
@@ -75,6 +82,7 @@ public class Manche {
             System.out.println("fin de distribution");
             misesJoueurs();
         }
+        //Vérifie si un joueur prend, si oui on lance la méthode suiteDeManche
         if (!(misesPartie.get(joueur1) == 0 && misesPartie.get(joueur2) == 0
                 && misesPartie.get(joueur3) == 0 && misesPartie.get(joueur4) == 0)) {
             suiteDeManche();
@@ -84,13 +92,16 @@ public class Manche {
 
     public void suiteDeManche() {
         int maxValue = 0;
+        //Verifie quel joueur a fait la mise la plus haute
         for (Joueur i : joueurs) {
             if (misesPartie.get(i) > maxValue) {
                 maxValue = misesPartie.get(i);
-                attaquant = i;
+                attaquant = i;  //le joueur ayant la mise la plus haute devient l'attaquant
             }
         }
         System.out.println("mise de l'attaquant: " + attaquant.miseJoueur);
+
+        //Score à réaliser en fonction du nombre de bouts
         countBoutAttaquant = nombreCartesSpeciales(attaquant, attaquant.mainJoueur)[0];
         switch (countBoutAttaquant) {
             case 0:
@@ -108,6 +119,7 @@ public class Manche {
             default:
                 break;
         }
+        // Initialisation des plis et gestion du chien
         pliAttaque.clear();
         pliDefense.clear();
         gestionDuChien();
@@ -120,8 +132,11 @@ public class Manche {
 
     public void lancementDesPlis() {
         List<Joueur> swapJoueurs = joueurs;
+        // Boucle jusqu'à ce que tous les joueurs aient joué toutes leurs cartes
         while (!joueur1.mainJoueur.isEmpty()) {
             System.out.println(joueur1.mainJoueur.size());
+            
+            //Création d'un pli
             Pli pli = new Pli(joueurs, excusePassee);
             excusePassee = pli.excusePassee;
             for (int i = 0; i < joueurs.size(); i++) {
