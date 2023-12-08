@@ -8,6 +8,6 @@ public class Application {
         //Création d'un deck
         Deck deckTarot = new Deck();
         //Création d'une nouvelle partie
-        Partie partie = new Partie(3, deckTarot, 3); //(nb_joueur, deck, nb_manches)
+        Partie partie = new Partie(4, deckTarot, 3); //(nb_joueur, deck, nb_manches)
     }
 }

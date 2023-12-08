@@ -45,7 +45,7 @@ public class Pli {
                 excuseMap.put("Excuse", joueur);
                 carteExcuse = carteJouee;
             }
-            if(carteJouee.nomCarte.equals("1 d'Atout")){
+            if (carteJouee.nomCarte.equals("1 d'Atout")) {
                 petitMap.put("1 d'Atout", joueur);
             }
             cartesJouees.add(carteJouee);
@@ -85,12 +85,23 @@ public class Pli {
                 System.out.println("Le " + joueurs.get(i).nomJoueur + " echange les cartes " + carte1.getNom() + " et "
                         + carte2.getNom());
             }
-            joueurs.get(0).mainJoueur.add(cartesPermutees.get(4));
-            joueurs.get(0).mainJoueur.add(cartesPermutees.get(5));
-            joueurs.get(1).mainJoueur.add(cartesPermutees.get(0));
-            joueurs.get(1).mainJoueur.add(cartesPermutees.get(1));
-            joueurs.get(2).mainJoueur.add(cartesPermutees.get(2));
-            joueurs.get(2).mainJoueur.add(cartesPermutees.get(3));
+            if (joueurs.size() == 3) {
+                joueurs.get(0).mainJoueur.add(cartesPermutees.get(4));
+                joueurs.get(0).mainJoueur.add(cartesPermutees.get(5));
+                joueurs.get(1).mainJoueur.add(cartesPermutees.get(0));
+                joueurs.get(1).mainJoueur.add(cartesPermutees.get(1));
+                joueurs.get(2).mainJoueur.add(cartesPermutees.get(2));
+                joueurs.get(2).mainJoueur.add(cartesPermutees.get(3));
+            } else if (joueurs.size() == 4) {
+                joueurs.get(0).mainJoueur.add(cartesPermutees.get(6));
+                joueurs.get(0).mainJoueur.add(cartesPermutees.get(7));
+                joueurs.get(1).mainJoueur.add(cartesPermutees.get(4));
+                joueurs.get(1).mainJoueur.add(cartesPermutees.get(5));
+                joueurs.get(2).mainJoueur.add(cartesPermutees.get(0));
+                joueurs.get(2).mainJoueur.add(cartesPermutees.get(1));
+                joueurs.get(3).mainJoueur.add(cartesPermutees.get(2));
+                joueurs.get(3).mainJoueur.add(cartesPermutees.get(3));
+            }
             for (Joueur j : joueurs) {
                 Collections.sort(j.mainJoueur, Comparator.comparing(Carte::getValeur));
                 Collections.sort(j.mainJoueur, Comparator.comparing(Carte::getType));

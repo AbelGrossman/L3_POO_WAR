@@ -60,11 +60,16 @@ public class Manche {
         misesPartie.put(joueur4, 0);
         joueurs.add(joueur2);
         joueurs.add(joueur3);
+        if (joueur4 != null) {
+            joueurs.add(joueur4);
+        }
         joueurs.add(joueur1);
+        for (Joueur j : joueurs) {
+            System.out.println("joueur: " + j.nomJoueur);
+        }
         deckMelange = dM;
         typeChien = tC;
         if (joueur4 != null) {
-            joueurs.add(joueur4);
             distributionQuatreJoueurs();
             System.out.println("fin de distribution");
             misesJoueurs();
@@ -172,9 +177,11 @@ public class Manche {
             if (joueur1.mainJoueur.size() == 1) {
                 for (Carte c : pli.cartesJouees) {
                     if (c.nomCarte.equals("1 d'Atout")) {
-                        if (pli.joueurGagnant.roleJoueur.equals("Attaquant") && pli.petitMap.get("1 d'Atout").roleJoueur.equals("Attaquant")) {
+                        if (pli.joueurGagnant.roleJoueur.equals("Attaquant")
+                                && pli.petitMap.get("1 d'Atout").roleJoueur.equals("Attaquant")) {
                             bonusPetitAuBoutAttaquant = true;
-                        } else if (pli.joueurGagnant.roleJoueur.equals("Defenseur") && pli.petitMap.get("1 d'Atout").roleJoueur.equals("Defenseur")) {
+                        } else if (pli.joueurGagnant.roleJoueur.equals("Defenseur")
+                                && pli.petitMap.get("1 d'Atout").roleJoueur.equals("Defenseur")) {
                             bonusPetitAuBoutDefenseur = true;
                         }
                         if (c.nomCarte.equals("Excuse")) {
@@ -456,7 +463,7 @@ public class Manche {
                 if (typeChien == 6 || typeChien == 10) {
                     packetChien.add(deckMelange.get(i++));
                 }
-                if (typeChien == 2 && count % 8 == 0) {
+                if (typeChien == 2 && count % 6 == 0) {
                     packetChien.add(deckMelange.get(i++));
                 }
             }
@@ -586,6 +593,7 @@ public class Manche {
     }
 
     public void gestionDuChien() {
+        System.out.println("type chien: " + typeChien + ". Taille packet chien: " + packetChien.size());
         if (attaquant.miseJoueur.equals("Petite") || attaquant.miseJoueur.equals("Garde")) {
             for (Joueur i : joueurs) {
                 if (i != attaquant) {
@@ -926,12 +934,20 @@ public class Manche {
                     System.out.println("bonus petit au bout defenseur");
                     i.pointsJoueur += 10 * mise;
                 }
+                if (bonusPetitAuBoutAttaquant) {
+                    i.pointsJoueur -= 10 * mise;
+                }
+
             } else {
                 attaquant.pointsJoueur += -1 * victoireDefense * nombrePointsTotal * (joueurs.size() - 1);
                 if (bonusPetitAuBoutAttaquant) {
                     System.out.println("bonus petit au bout attaquant");
-                    attaquant.pointsJoueur += 10 * mise;
+                    attaquant.pointsJoueur += 10 * mise * (joueurs.size() - 1);
                 }
+                if (bonusPetitAuBoutDefenseur) {
+                    attaquant.pointsJoueur -= 10 * mise * (joueurs.size() - 1);
+                }
+
             }
         }
 

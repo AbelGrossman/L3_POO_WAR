@@ -8,26 +8,27 @@ import java.util.HashMap;
 import java.util.Random;
 
 public class Partie {
-    private Joueur joueur1Partie;
-    private Joueur joueur2Partie;
-    private Joueur joueur3Partie;
-    private Joueur joueur4Partie;
+    public Joueur joueur1Partie;
+    public Joueur joueur2Partie;
+    public Joueur joueur3Partie;
+    public Joueur joueur4Partie;
 
-    private Joueur joueur1Manche;
-    private Joueur joueur2Manche;
-    private Joueur joueur3Manche;
-    private Joueur joueur4Manche;
+    public Joueur joueur1Manche;
+    public Joueur joueur2Manche;
+    public Joueur joueur3Manche;
+    public Joueur joueur4Manche;
 
-    private List<Carte> deckMelangePartie;
+    public List<Carte> deckMelangePartie;
 
     List<Carte> main1Partie = new ArrayList<>();
     List<Carte> main2Partie = new ArrayList<>();
     List<Carte> main3Partie = new ArrayList<>();
     List<Carte> main4Partie = new ArrayList<>();
     Map<Joueur, Integer> misesPartie = new HashMap<>();
-    List<Joueur> joueurs = new ArrayList<>();
+    public List<Joueur> joueurs = new ArrayList<>();
     Random rand = new Random();
-    int typeChien;
+    public int typeChien;
+    public Joueur joueurGagnant;
 
     public Partie(int nombreJoueurs, Deck deckTarot, int nombreDeManches) {
         melangeDuDeck(deckTarot);
@@ -53,10 +54,10 @@ public class Partie {
             selectionChien(nombreJoueurs);
             System.out.println();
             System.out.println();
-            System.out.println("Debut de la manche " + i);
+            int numeroManche = i + 1;
+            System.out.println("Debut de la manche " + numeroManche);
             System.out.println();
             System.out.println();
-            typeChien = 9;
             misesPartie.put(joueur1Partie, 0);
             misesPartie.put(joueur2Partie, 0);
             misesPartie.put(joueur3Partie, 0);
@@ -93,26 +94,47 @@ public class Partie {
                 joueur1Manche = joueur2Manche;
                 joueur2Manche = joueur3Manche;
                 joueur3Manche = swap;
-            }
-            if (nombreJoueurs == 4) {
-                joueur3Manche = joueur4Manche;
-                joueur4Manche = swap;
+                if (nombreJoueurs == 4) {
+                    joueur4Manche.mainJoueur.clear();
+                    joueur3Manche = joueur4Manche;
+                    joueur4Manche = swap;
+                }
             }
             System.out.println("Points j1: " + joueur1Partie.pointsJoueur);
             System.out.println("Points j2: " + joueur2Partie.pointsJoueur);
             System.out.println("Points j3: " + joueur3Partie.pointsJoueur);
-            // System.out.println("Points j4: " + joueur4.pointsJoueur);
+            //System.out.println("Points j4: " + joueur4Partie.pointsJoueur);
         }
-        String joueurGagnant = joueur1Partie.nomJoueur;
-        if (joueur2Partie.pointsJoueur > joueur1Partie.pointsJoueur
-                && joueur2Partie.pointsJoueur > joueur3Partie.pointsJoueur) {
-            joueurGagnant = joueur2Partie.nomJoueur;
+        if (nombreJoueurs == 3) {
+            if (joueur1Partie.pointsJoueur > joueur2Partie.pointsJoueur
+                    && joueur1Partie.pointsJoueur > joueur3Partie.pointsJoueur) {
+                joueurGagnant = joueur1Partie;
+            } else if (joueur2Partie.pointsJoueur > joueur1Partie.pointsJoueur
+                    && joueur2Partie.pointsJoueur > joueur3Partie.pointsJoueur) {
+                joueurGagnant = joueur2Partie;
+            } else if (joueur3Partie.pointsJoueur > joueur1Partie.pointsJoueur
+                    && joueur3Partie.pointsJoueur > joueur2Partie.pointsJoueur) {
+                joueurGagnant = joueur3Partie;
+            }
+        } else if (nombreJoueurs == 4) {
+            if (joueur1Partie.pointsJoueur > joueur2Partie.pointsJoueur
+                    && joueur1Partie.pointsJoueur > joueur3Partie.pointsJoueur
+                    && joueur1Partie.pointsJoueur > joueur4Partie.pointsJoueur) {
+                joueurGagnant = joueur1Partie;
+            } else if (joueur2Partie.pointsJoueur > joueur1Partie.pointsJoueur
+                    && joueur2Partie.pointsJoueur > joueur3Partie.pointsJoueur
+                    && joueur2Partie.pointsJoueur > joueur4Partie.pointsJoueur) {
+                joueurGagnant = joueur2Partie;
+            } else if (joueur3Partie.pointsJoueur > joueur1Partie.pointsJoueur
+                    && joueur3Partie.pointsJoueur > joueur2Partie.pointsJoueur
+                    && joueur3Partie.pointsJoueur > joueur4Partie.pointsJoueur) {
+                joueurGagnant = joueur3Partie;
+            } else if (joueur4Partie.pointsJoueur > joueur1Partie.pointsJoueur
+                    && joueur4Partie.pointsJoueur > joueur2Partie.pointsJoueur
+                    && joueur4Partie.pointsJoueur > joueur3Partie.pointsJoueur) {
+                joueurGagnant = joueur4Partie;
+            }
         }
-        if (joueur3Partie.pointsJoueur > joueur1Partie.pointsJoueur
-                && joueur3Partie.pointsJoueur > joueur2Partie.pointsJoueur) {
-            joueurGagnant = joueur3Partie.nomJoueur;
-        }
-        System.out.println("Le "+joueurGagnant+" gagne la partie!");
     }
 
     public void melangeDuDeck(Deck deckTarot) {
@@ -140,7 +162,7 @@ public class Partie {
             int randomValue = rand.nextInt(3);
             switch (randomValue) {
                 case 0:
-                    typeChien = 4;
+                    typeChien = 2;
                     break;
                 case 1:
                     typeChien = 6;
