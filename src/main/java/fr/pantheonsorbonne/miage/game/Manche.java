@@ -16,15 +16,17 @@ public class Manche {
     Joueur joueur2;
     Joueur joueur3;
     Joueur joueur4;
-    List<Carte> deckMelange;
+    List<Carte> deckMelange;    //deck après le mélange
     int typeChien;
-    List<Carte> packetChien = new ArrayList<>();
+    List<Carte> packetChien = new ArrayList<>();    //chien
+    //Différent type de prise
     String GC = "Garde Contre";
     String GS = "Garde Sans";
     String G = "Garde";
     String P2 = "Petite";
     String P1 = "Passer";
     List<Joueur> joueurs = new ArrayList<>();
+    //Pour compter point ?
     Map<String, Integer> conteurDeMises = new HashMap<String, Integer>() {
         {
             put(GC, 0);
