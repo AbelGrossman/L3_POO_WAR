@@ -135,10 +135,12 @@ public class Manche {
         // Boucle jusqu'à ce que tous les joueurs aient joué toutes leurs cartes
         while (!joueur1.mainJoueur.isEmpty()) {
             System.out.println(joueur1.mainJoueur.size());
-            
+
             //Création d'un pli
             Pli pli = new Pli(joueurs, excusePassee);
             excusePassee = pli.excusePassee;
+            //La je comprends rien mdrr c'est pour le changement de carte dont il avait parlé ?
+            // Gestion de l'Excuse et réorganisation des joueurs pour le prochain pli
             for (int i = 0; i < joueurs.size(); i++) {
                 if (joueurs.get(i) == pli.joueurGagnant) {
                     Joueur swap1;
@@ -186,17 +188,22 @@ public class Manche {
                     }
                 }
             }
+            // Gestion des cartes spéciales et des bonus "Petit au bout"            
             if (joueur1.mainJoueur.size() == 1) {
                 for (Carte c : pli.cartesJouees) {
                     if (c.nomCarte.equals("1 d'Atout")) {
+                        // Vérification des conditions pour le bonus "Petit au bout" pour l'attaquant
                         if (pli.joueurGagnant.roleJoueur.equals("Attaquant") && pli.petitMap.get("1 d'Atout").roleJoueur.equals("Attaquant")) {
                             bonusPetitAuBoutAttaquant = true;
+                        // Vérification des conditions pour le bonus "Petit au bout" pour la defense
                         } else if (pli.joueurGagnant.roleJoueur.equals("Defenseur") && pli.petitMap.get("1 d'Atout").roleJoueur.equals("Defenseur")) {
                             bonusPetitAuBoutDefenseur = true;
                         }
+                        //Rajoute un commentaire ici en gros je pense cest quand tu fais don de l'excuse donc tu enleves la carte du pli ?
                         if (c.nomCarte.equals("Excuse")) {
                             excuseALaFin = true;
                             Boolean inAttaque = false;
+                            // Recherche de l'Excuse dans le pli d'attaque
                             for (Carte d : pliAttaque) {
                                 if (d.getNom().equals("Excuse")) {
                                     pliAttaque.remove(d);
@@ -206,6 +213,7 @@ public class Manche {
                                 }
 
                             }
+                            // Si l'Excuse n'est pas dans le pli d'attaque, recherche dans le pli de défense
                             if (!inAttaque) {
                                 for (Carte d : pliDefense) {
                                     if (d.getNom().equals("Excuse")) {
@@ -229,6 +237,7 @@ public class Manche {
             conteurDeMises.put(i.miseJoueur, 1);
             switch (i.miseJoueur) {
                 case "Garde Contre":
+                    //ici la value est le multiplicateur du score (donc plus la mise est haute plus le multiplicateur est haut)
                     misesPartie.put(i, 4);
                     break;
                 case "Garde Sans":
@@ -246,7 +255,8 @@ public class Manche {
             }
         }
     }
-
+    
+    // Fonction pour déterminer la mise d'un joueur en fonction de sa main
     public String joueurMise(Joueur joueur, List<Carte> main) {
         int[] cartesSpeciales = nombreCartesSpeciales(joueur, main);
         int countBout = cartesSpeciales[0];
