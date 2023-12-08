@@ -125,9 +125,7 @@ On vérifie d’abord le nombre de bouts que l’attaquant possède, puis on cal
 
 Le score est calculé de la manière suivante:
 
-Score=(25+Différence+PetitAuBout)*Mise
-
-Total=Score+Poignée+Chelem
+Total=(25+Différence+PetitAuBout)*Mise
 
 La Différence est l’écart en valeur absolue de points entre la somme calculée et la valeur requise. Cet ecart est donc toujours positif.
 
@@ -137,23 +135,8 @@ Chaque défenseur remporte le total, et l'attaquant remporte le total multiplié
 
 Exemple: Le total est de 56 points, les joueurs 1, 2 et 3 sont des défenseurs et le joueur 4 est l'attaquant. Si l’attaquant gagne, il remporte 168 points (56*3). Chaque défenseur remporte -56 points puisqu’ils ont perdu.
 
-Le PetitAuBout, la Poignée et le Chelem sont des bonus. 
-
-### Bonus de points:
-
 Petit au bout:
 Bonus obtenu si le Petit est joué lors du dernier pli. Le bonus vaut +10 si celui qui remporte la manche remporte ce pli, et -10 sinon. 
-
-Poignée:
-La poignée consiste à révéler ses atouts en début de partie. Elle peut être de 10, 13 ou 15 atouts, et les points varient en fonction: 10 -> 20 points / 13 -> 30 points / 15 -> 40 points.
-Elle est déclarée avant que le joueur pose sa première carte.
-
-Chelem:
-Le chelem est un bonus extrêmement rare, obtenu quand un camp remporte l’ensemble des plis. Uniquement l’attaquant peut annoncer un chelem.
-Il vaut 200 s’il n’est pas annoncé, 400 s’il est annoncé, et -200 s’il est annoncé mais pas réalisé.
-Il est déclaré avant le premier pli.
-Celui qui déclare un chelem prend la main. Il doit jouer l’excuse au dernier pli, mais peut quand même obtenir les bonus du petit au bout s’il le joue à l’avant dernier pli.
-
 
 ## Fin d’une partie:
 
