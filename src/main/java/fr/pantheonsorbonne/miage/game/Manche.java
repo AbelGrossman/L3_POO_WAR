@@ -307,7 +307,7 @@ public class Manche {
             }
             // Conditions du type de prise basées sur le nombre de bouts, le nombre de rois
             // et le nombre d'atouts
-            // Meme logique jusqu'a la ligne 436 nous avons adapté les prises en fonction du
+            // Meme logique jusqu'a la ligne 457 nous avons adapté les prises en fonction du
             // nombre de bouts de rois et d'atouts qui sont les cartes les plus importantes
             // pour gagner une partie
             if (countBout == 3) {
@@ -458,6 +458,7 @@ public class Manche {
         return P1;
     }
 
+    //Méthode pour compter le nombre de cartes spéciales (une carte "spéciale" est soit un bout, soit un roi, soit un atout)
     public int[] nombreCartesSpeciales(Joueur joueur, List<Carte> main) {
         int[] cartesSpeciales = new int[3];
         for (int i = 0; i < main.size(); i++) {
@@ -476,16 +477,21 @@ public class Manche {
     }
 
     public void distributionQuatreJoueurs() {
+        // Rotation aléatoire du deck mélangé
         Collections.rotate(deckMelange, deckMelange.size() / (rand.nextInt(4) + 1));
         int countJ1 = 0;
         int countJ2 = 0;
         int countJ3 = 0;
         int countJ4 = 0;
+        //indices pour parcourir le deck
         int i = 0;
         int count = 0;
+        // Boucle infinie (break à la fin de la distribution)
         for (;;) {
+            // Distribution des cartes aux joueurs en fonction du compteur
             if (countJ1 == countJ2) {
                 for (int j = 0; j < 3; j++) {
+                    // Ajoute la carte du deck mélangé à la main du deuxième joueur et incrémente l'indice pour la prochaine carte
                     joueur2.mainJoueur.add(deckMelange.get(i++));
                 }
                 countJ2++;
@@ -567,6 +573,7 @@ public class Manche {
         }
     }
 
+    //Meme logique que pour la distributionQuatreJoueurs
     public void distributionTroisJoueurs() {
         Collections.rotate(deckMelange, deckMelange.size() / (rand.nextInt(4) + 1));
         int countJ1 = 0;
