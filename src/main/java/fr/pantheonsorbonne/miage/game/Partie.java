@@ -103,7 +103,7 @@ public class Partie {
             System.out.println("Points j1: " + joueur1Partie.pointsJoueur);
             System.out.println("Points j2: " + joueur2Partie.pointsJoueur);
             System.out.println("Points j3: " + joueur3Partie.pointsJoueur);
-            System.out.println("Points j4: " + joueur4Partie.pointsJoueur);
+            //System.out.println("Points j4: " + joueur4Partie.pointsJoueur);
         }
         if (nombreJoueurs == 3) {
             if (joueur1Partie.pointsJoueur > joueur2Partie.pointsJoueur
