@@ -515,6 +515,7 @@ public class Manche {
                 countJ1++;
             }
             count++;
+            // Distribution du chien en fonction de typeChien
             if (count % 2 == 0 && count <= 12) {
                 if (typeChien == 6 || typeChien == 10) {
                     packetChien.add(deckMelange.get(i++));
@@ -523,10 +524,12 @@ public class Manche {
                     packetChien.add(deckMelange.get(i++));
                 }
             }
+            // Condition de sortie de la boucle,  20 cartes par joueur
             if (count == 20)
                 break;
         }
 
+        // Distribution des cartes restantes en fonction de typeChien
         if (typeChien == 10) {
             while (i < 72) {
                 joueur2.mainJoueur.add(deckMelange.get(i++));
@@ -649,14 +652,19 @@ public class Manche {
         }
     }
 
+    //méthode de gestion du chien
     public void gestionDuChien() {
         System.out.println("type chien: " + typeChien + ". Taille packet chien: " + packetChien.size());
+
+        // Vérifie la mise du joueur attaquant pour déterminer le traitement du chien car on ne regarde pas le chien si GC ou GS
         if (attaquant.miseJoueur.equals("Petite") || attaquant.miseJoueur.equals("Garde")) {
             for (Joueur i : joueurs) {
                 if (i != attaquant) {
+                    // Trie les mains des défenseurs par valeur et type de carte
                     Collections.sort(i.mainJoueur, Comparator.comparing(Carte::getValeur));
                     Collections.sort(i.mainJoueur, Comparator.comparing(Carte::getType));
                 }
+                //Trie la main du joueur attaquant pour choisir quelles cartes mettrent dans le chien
                 if (i == attaquant) {
                     i.roleJoueur = "Attaquant";
                     i.mainJoueur.addAll(packetChien);
