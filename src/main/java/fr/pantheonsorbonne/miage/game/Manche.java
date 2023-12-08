@@ -16,15 +16,19 @@ public class Manche {
     Joueur joueur2;
     Joueur joueur3;
     Joueur joueur4;
-    List<Carte> deckMelange;
+    List<Carte> deckMelange; // deck après le mélange
     int typeChien;
-    List<Carte> packetChien = new ArrayList<>();
+    List<Carte> packetChien = new ArrayList<>(); // Cartes du chien
+
+    // Différents types de prises
     String GC = "Garde Contre";
     String GS = "Garde Sans";
     String G = "Garde";
     String P2 = "Petite";
     String P1 = "Passer";
     List<Joueur> joueurs = new ArrayList<>();
+
+    // Compteur pour chaque type de prise.
     Map<String, Integer> conteurDeMises = new HashMap<String, Integer>() {
         {
             put(GC, 0);
@@ -36,19 +40,24 @@ public class Manche {
     };
     Map<Joueur, Integer> misesPartie = new HashMap<>();
     Joueur attaquant;
-    public static List<Carte> pliDefense = new ArrayList<>();
-    public static List<Carte> pliAttaque = new ArrayList<>();
+    public static List<Carte> pliDefense = new ArrayList<>(); // Plis des defenseurs
+    public static List<Carte> pliAttaque = new ArrayList<>(); // Plis de l'attaquant
     String[] couleurVerifiees = new String[4];
     int nombrePointsTotal;
     int scoreARealiser;
-    int countBoutAttaquant;
-    Boolean excusePassee = false;
-    public static Boolean donALAttaque = false;
-    public static Boolean donALaDefense = false;
-    Boolean excuseALaFin = false;
-    Boolean bonusPetitAuBoutAttaquant = false;
-    Boolean bonusPetitAuBoutDefenseur = false;
+    int countBoutAttaquant; // Nombre de bouts dans la main de l'attaquant
+    Boolean excusePassee = false; // Indique si l'Excuse a été jouée pendant un pli
 
+    // Les attributs suivants permettent de gérer les différents cas de l'excuse
+    // (don d'une carte si le pli est perdu)
+    public static Boolean donALAttaque = false; // Indique si le don a été fait à l'attaquant
+    public static Boolean donALaDefense = false; // Indique si le don a été fait à la défense
+    Boolean excuseALaFin = false; // Indique si l'excuse a été jouée à la fin de la partie
+    Boolean bonusPetitAuBoutAttaquant = false; // Indique si le bonus "Petit au bout" a été obtenu par l'attaquant
+    Boolean bonusPetitAuBoutDefenseur = false; // Indique si le bonus "Petit au bout" a été obtenu par la défense
+
+    // Constructeur de la classe Manche avec les 4 joueurs, le deck mélangé ainsi
+    // que le type de chien
     public Manche(Joueur j1, Joueur j2, Joueur j3, Joueur j4, List<Carte> dM, int tC) {
         joueur1 = j1;
         joueur2 = j2;
@@ -69,6 +78,8 @@ public class Manche {
         }
         deckMelange = dM;
         typeChien = tC;
+
+        // Distribution des cartes en fonction du nombre de joueurs
         if (joueur4 != null) {
             distributionQuatreJoueurs();
             System.out.println("fin de distribution");
@@ -78,6 +89,7 @@ public class Manche {
             System.out.println("fin de distribution");
             misesJoueurs();
         }
+        // Vérifie si un joueur prend, si oui on lance la méthode suiteDeManche
         if (!(misesPartie.get(joueur1) == 0 && misesPartie.get(joueur2) == 0
                 && misesPartie.get(joueur3) == 0 && misesPartie.get(joueur4) == 0)) {
             suiteDeManche();
@@ -87,13 +99,16 @@ public class Manche {
 
     public void suiteDeManche() {
         int maxValue = 0;
+        // Verifie quel joueur a fait la mise la plus haute
         for (Joueur i : joueurs) {
             if (misesPartie.get(i) > maxValue) {
                 maxValue = misesPartie.get(i);
-                attaquant = i;
+                attaquant = i; // le joueur ayant la mise la plus haute devient l'attaquant
             }
         }
         System.out.println("mise de l'attaquant: " + attaquant.miseJoueur);
+
+        // Score à réaliser en fonction du nombre de bouts
         countBoutAttaquant = nombreCartesSpeciales(attaquant, attaquant.mainJoueur)[0];
         switch (countBoutAttaquant) {
             case 0:
@@ -111,6 +126,7 @@ public class Manche {
             default:
                 break;
         }
+        // Initialisation des plis et gestion du chien
         pliAttaque.clear();
         pliDefense.clear();
         gestionDuChien();
@@ -123,10 +139,16 @@ public class Manche {
 
     public void lancementDesPlis() {
         List<Joueur> swapJoueurs = joueurs;
+        // Boucle jusqu'à ce que tous les joueurs aient joué toutes leurs cartes
         while (!joueur1.mainJoueur.isEmpty()) {
             System.out.println(joueur1.mainJoueur.size());
+
+            // Création d'un pli
             Pli pli = new Pli(joueurs, excusePassee);
             excusePassee = pli.excusePassee;
+            // La je comprends rien mdrr c'est pour le changement de carte dont il avait
+            // parlé ?
+            // Gestion de l'Excuse et réorganisation des joueurs pour le prochain pli
             for (int i = 0; i < joueurs.size(); i++) {
                 if (joueurs.get(i) == pli.joueurGagnant) {
                     Joueur swap1;
@@ -174,6 +196,7 @@ public class Manche {
                     }
                 }
             }
+            // Gestion des cartes spéciales et des bonus "Petit au bout"
             if (joueur1.mainJoueur.size() == 1) {
                 for (Carte c : pli.cartesJouees) {
                     if (c.nomCarte.equals("1 d'Atout")) {
@@ -182,34 +205,46 @@ public class Manche {
                             bonusPetitAuBoutAttaquant = true;
                         } else if (pli.joueurGagnant.roleJoueur.equals("Defenseur")
                                 && pli.petitMap.get("1 d'Atout").roleJoueur.equals("Defenseur")) {
-                            bonusPetitAuBoutDefenseur = true;
-                        }
-                        if (c.nomCarte.equals("Excuse")) {
-                            excuseALaFin = true;
-                            Boolean inAttaque = false;
-                            for (Carte d : pliAttaque) {
-                                if (d.getNom().equals("Excuse")) {
-                                    pliAttaque.remove(d);
-                                    pliDefense.add(d);
-                                    inAttaque = true;
-                                    break;
-                                }
-
+                            // Vérification des conditions pour le bonus "Petit au bout" pour l'attaquant
+                            if (pli.joueurGagnant.roleJoueur.equals("Attaquant")
+                                    && pli.petitMap.get("1 d'Atout").roleJoueur.equals("Attaquant")) {
+                                bonusPetitAuBoutAttaquant = true;
+                                // Vérification des conditions pour le bonus "Petit au bout" pour la defense
+                            } else if (pli.joueurGagnant.roleJoueur.equals("Defenseur")
+                                    && pli.petitMap.get("1 d'Atout").roleJoueur.equals("Defenseur")) {
+                                bonusPetitAuBoutDefenseur = true;
                             }
-                            if (!inAttaque) {
-                                for (Carte d : pliDefense) {
+                            // Rajoute un commentaire ici en gros je pense cest quand tu fais don de
+                            // l'excuse donc tu enleves la carte du pli ?
+                            if (c.nomCarte.equals("Excuse")) {
+                                excuseALaFin = true;
+                                Boolean inAttaque = false;
+                                // Recherche de l'Excuse dans le pli d'attaque
+                                for (Carte d : pliAttaque) {
                                     if (d.getNom().equals("Excuse")) {
-                                        pliDefense.remove(d);
-                                        pliAttaque.add(d);
+                                        pliAttaque.remove(d);
+                                        pliDefense.add(d);
+                                        inAttaque = true;
                                         break;
+                                    }
+
+                                }
+                                // Si l'Excuse n'est pas dans le pli d'attaque, recherche dans le pli de défense
+                                if (!inAttaque) {
+                                    for (Carte d : pliDefense) {
+                                        if (d.getNom().equals("Excuse")) {
+                                            pliDefense.remove(d);
+                                            pliAttaque.add(d);
+                                            break;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
+                joueurs = swapJoueurs;
             }
-            joueurs = swapJoueurs;
         }
     }
 
@@ -219,6 +254,8 @@ public class Manche {
             conteurDeMises.put(i.miseJoueur, 1);
             switch (i.miseJoueur) {
                 case "Garde Contre":
+                    // ici la value est le multiplicateur du score (donc plus la mise est haute plus
+                    // le multiplicateur est haut)
                     misesPartie.put(i, 4);
                     break;
                 case "Garde Sans":
@@ -237,17 +274,22 @@ public class Manche {
         }
     }
 
+    // Fonction pour déterminer la mise d'un joueur en fonction de sa main
     public String joueurMise(Joueur joueur, List<Carte> main) {
         int[] cartesSpeciales = nombreCartesSpeciales(joueur, main);
         int countBout = cartesSpeciales[0];
         int countRoi = cartesSpeciales[1];
         int countAtout = cartesSpeciales[2];
+        // !=1 verifie qu'une Garde Contre n'a pas deja été annoncée
         if (conteurDeMises.get(GC) != 1) {
+            // Condition pour la garde contre : avoir 16 atouts (pas une règle officielle
+            // mais définit par nous même grace à notre expérience du jeu)
             if (countAtout > 16) {
                 System.out.println("case 1!");
                 return GC;
             }
             if (conteurDeMises.get(GS) != 1) {
+                // Pareil ici mais pour la Garde Sans etc...
                 if (countAtout >= 14) {
                     System.out.println("case 2!");
                     return GS;
@@ -263,9 +305,16 @@ public class Manche {
                     }
                 }
             }
+            // Conditions du type de prise basées sur le nombre de bouts, le nombre de rois
+            // et le nombre d'atouts
+            // Meme logique jusqu'a la ligne 436 nous avons adapté les prises en fonction du
+            // nombre de bouts de rois et d'atouts qui sont les cartes les plus importantes
+            // pour gagner une partie
             if (countBout == 3) {
                 if (countRoi >= 1) {
                     if (countAtout >= 6) {
+                        // Si on a les 3 bouts, 1 roi ou plus et 6 atouts ou plus on fait une Garde
+                        // Contre
                         System.out.println("case 5!");
                         return GC;
                     } else if (conteurDeMises.get(GS) != 1) {
@@ -286,6 +335,7 @@ public class Manche {
             if (countBout == 2) {
                 if (countRoi == 4) {
                     if (countAtout >= 9) {
+                        // Si on a 2 bouts, les 4 rois et 9 atouts ou plus on fait une Garde Contre
                         System.out.println("case 9!");
                         return GC;
                     }

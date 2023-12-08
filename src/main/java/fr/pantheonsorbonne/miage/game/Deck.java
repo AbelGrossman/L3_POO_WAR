@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-//Classe Deck (les cartes du joueur)
+//Classe Deck
 public class Deck {
 
     //Liste permettant de stocker les cartes dans le deck complet du jeu
@@ -16,6 +16,7 @@ public class Deck {
         ajouterAuDeck();
     }
 
+    //Méthode permettant de créer le jeu au complet
     public void ajouterAuDeck() {
         String[] typesDeCartes = { "Trefle", "Pique", "Carreau", "Coeur" };
         String type = null;     //couleur de la carte
@@ -59,6 +60,7 @@ public class Deck {
             bout = false;
             points = 1;
             if (i == 1 || i == 21) {
+                //Les atouts 1 et 21 sont des bouts.
                 bout = true;
                 points = 5;
             }
@@ -66,7 +68,7 @@ public class Deck {
             Carte nouvelleCarte = new Carte("Atout", i, nom, bout, points);
             deckComplet.add(nouvelleCarte);
         }
-        // Ajouter la carte Excuse au deck.
+        // Ajout la carte Excuse au deck.
         Carte nouvelleCarte = new Carte("Excuse", 22, "Excuse", bout, 5);
         deckComplet.add(nouvelleCarte);
     }
