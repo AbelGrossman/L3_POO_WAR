@@ -262,12 +262,15 @@ public class Manche {
         int countBout = cartesSpeciales[0];
         int countRoi = cartesSpeciales[1];
         int countAtout = cartesSpeciales[2];
+        // !=1 verifie qu'une Garde Contre n'a pas deja été annoncée
         if (conteurDeMises.get(GC) != 1) {
+            //Condition pour la garde contre : avoir 16 atouts (pas une règle officielle mais définit par nous même grace à notre expérience du jeu)
             if (countAtout > 16) {
                 System.out.println("case 1!");
                 return GC;
             }
             if (conteurDeMises.get(GS) != 1) {
+                //Pareil ici mais pour la Garde Sans etc...
                 if (countAtout >= 14) {
                     System.out.println("case 2!");
                     return GS;
@@ -283,9 +286,12 @@ public class Manche {
                     }
                 }
             }
+        // Conditions du type de prise basées sur le nombre de bouts, le nombre de rois et le nombre d'atouts
+        //Meme logique jusqu'a la ligne 436 nous avons adapté les prises en fonction du nombre de bouts de rois et d'atouts qui sont les cartes les plus importantes pour gagner une partie
             if (countBout == 3) {
                 if (countRoi >= 1) {
                     if (countAtout >= 6) {
+                        //Si on a les 3 bouts, 1 roi ou plus et 6 atouts ou plus on fait une Garde Contre
                         System.out.println("case 5!");
                         return GC;
                     } else if (conteurDeMises.get(GS) != 1) {
@@ -306,6 +312,7 @@ public class Manche {
             if (countBout == 2) {
                 if (countRoi == 4) {
                     if (countAtout >= 9) {
+                        //Si on a 2 bouts, les 4 rois et 9 atouts ou plus on fait une Garde Contre
                         System.out.println("case 9!");
                         return GC;
                     }
