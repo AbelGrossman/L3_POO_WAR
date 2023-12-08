@@ -53,7 +53,7 @@ public class Partie {
             selectionChien(nombreJoueurs);
             System.out.println();
             System.out.println();
-            System.out.println("Debut du pli " + i);
+            System.out.println("Debut de la manche " + i);
             System.out.println();
             System.out.println();
             typeChien = 9;

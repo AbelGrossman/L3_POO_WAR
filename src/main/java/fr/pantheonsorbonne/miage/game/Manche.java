@@ -43,6 +43,11 @@ public class Manche {
     int scoreARealiser;
     int countBoutAttaquant;
     Boolean excusePassee = false;
+    public static Boolean donALAttaque = false;
+    public static Boolean donALaDefense = false;
+    Boolean excuseALaFin = false;
+    Boolean bonusPetitAuBoutAttaquant = false;
+    Boolean bonusPetitAuBoutDefenseur = false;
 
     public Manche(Joueur j1, Joueur j2, Joueur j3, Joueur j4, List<Carte> dM, int tC) {
         joueur1 = j1;
@@ -104,7 +109,10 @@ public class Manche {
         pliAttaque.clear();
         pliDefense.clear();
         gestionDuChien();
+        donALAttaque = false;
+        donALaDefense = false;
         lancementDesPlis();
+        gestionDuDon();
         calculPointsDeManche(pliAttaque);
     }
 
@@ -113,7 +121,7 @@ public class Manche {
         while (!joueur1.mainJoueur.isEmpty()) {
             System.out.println(joueur1.mainJoueur.size());
             Pli pli = new Pli(joueurs, excusePassee);
-            excusePassee=pli.excusePassee;
+            excusePassee = pli.excusePassee;
             for (int i = 0; i < joueurs.size(); i++) {
                 if (joueurs.get(i) == pli.joueurGagnant) {
                     Joueur swap1;
@@ -161,8 +169,41 @@ public class Manche {
                     }
                 }
             }
+            if (joueur1.mainJoueur.size() == 1) {
+                for (Carte c : pli.cartesJouees) {
+                    if (c.nomCarte.equals("1 d'Atout")) {
+                        if (pli.joueurGagnant.roleJoueur.equals("Attaquant") && pli.petitMap.get("1 d'Atout").roleJoueur.equals("Attaquant")) {
+                            bonusPetitAuBoutAttaquant = true;
+                        } else if (pli.joueurGagnant.roleJoueur.equals("Defenseur") && pli.petitMap.get("1 d'Atout").roleJoueur.equals("Defenseur")) {
+                            bonusPetitAuBoutDefenseur = true;
+                        }
+                        if (c.nomCarte.equals("Excuse")) {
+                            excuseALaFin = true;
+                            Boolean inAttaque = false;
+                            for (Carte d : pliAttaque) {
+                                if (d.getNom().equals("Excuse")) {
+                                    pliAttaque.remove(d);
+                                    pliDefense.add(d);
+                                    inAttaque = true;
+                                    break;
+                                }
+
+                            }
+                            if (!inAttaque) {
+                                for (Carte d : pliDefense) {
+                                    if (d.getNom().equals("Excuse")) {
+                                        pliDefense.remove(d);
+                                        pliAttaque.add(d);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            joueurs = swapJoueurs;
         }
-        joueurs = swapJoueurs;
     }
 
     public void misesJoueurs() {
@@ -776,6 +817,27 @@ public class Manche {
         return mainAttaquant;
     }
 
+    public void gestionDuDon() {
+        Carte carteDonnee = null;
+        if (donALAttaque && !excuseALaFin) {
+            System.out.println("Dont à l'attaque de: ");
+            do {
+                carteDonnee = pliDefense.get(rand.nextInt(pliDefense.size()));
+            } while (carteDonnee.pointsCarte != 1);
+            System.out.println(carteDonnee.nomCarte);
+            pliAttaque.remove(carteDonnee);
+            pliAttaque.add(carteDonnee);
+        } else if (donALaDefense) {
+            System.out.println("Dont à la defense de: ");
+            do {
+                carteDonnee = pliAttaque.get(rand.nextInt(pliAttaque.size()));
+            } while (carteDonnee.pointsCarte != 1);
+            System.out.println(carteDonnee.nomCarte);
+            pliAttaque.remove(carteDonnee);
+            pliDefense.add(carteDonnee);
+        }
+    }
+
     public void calculPointsDeManche(List<Carte> pliAttaque) {
         List<Carte> pliComptagePoints = new ArrayList<>();
         int taillePliAttaque = pliAttaque.size();
@@ -813,9 +875,6 @@ public class Manche {
     }
 
     public void comptageDesPoints(List<Carte> pliComptagePoints) {
-        int petitAuBout = 0;
-        int bonusPoignee = 0;
-        int bonusChelem = 0;
         int difference = 0;
         int mise = 0;
         int victoireDefense = 1;
@@ -858,15 +917,23 @@ public class Manche {
         } else {
             System.out.println("L'attaquant, qui est le " + attaquant.nomJoueur + ", chute!");
         }
-        nombrePointsTotal = ((25 + difference + petitAuBout) * mise) + bonusPoignee
-                + bonusChelem;
+        nombrePointsTotal = ((25 + difference) * mise);
         System.out.println("nombre de points total: " + nombrePointsTotal);
         for (Joueur i : joueurs) {
             if (i != attaquant) {
                 i.pointsJoueur += victoireDefense * nombrePointsTotal;
+                if (bonusPetitAuBoutDefenseur) {
+                    System.out.println("bonus petit au bout defenseur");
+                    i.pointsJoueur += 10 * mise;
+                }
             } else {
                 attaquant.pointsJoueur += -1 * victoireDefense * nombrePointsTotal * (joueurs.size() - 1);
+                if (bonusPetitAuBoutAttaquant) {
+                    System.out.println("bonus petit au bout attaquant");
+                    attaquant.pointsJoueur += 10 * mise;
+                }
             }
         }
+
     }
 }
