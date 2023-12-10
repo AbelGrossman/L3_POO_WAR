@@ -15,7 +15,7 @@ public class Joueur {
     public List<Carte> pliJoueur;
     public String roleJoueur = "Defenseur";
     public Map<String, Integer> nombreCarteCouleurDansMain = new HashMap<>();
-    public int nombreAtoutsSups;
+    public int nombreAtoutsSups; 
     public int nombreAtoutsInfs;
     Map<Integer, Boolean> treflesDansMain = new HashMap<>();
     Map<Integer, Boolean> carreauxDansMain = new HashMap<>();
@@ -24,11 +24,13 @@ public class Joueur {
     Random rand = new Random();
     Boolean excusePassee;
 
+    //Constructeur de la classe Joueur
     public Joueur(String nom, List<Carte> main, int points, int niveau) {
         nomJoueur = nom;
         mainJoueur = main;
         pointsJoueur = points;
         niveauJoueur = niveau;
+        //Ajoute les cartes par couleur dans la main du joueur dans chacunes des hashmap
         for (int i = 1; i < 15; i++) {
             treflesDansMain.put(i, false);
             carreauxDansMain.put(i, false);
@@ -43,6 +45,7 @@ public class Joueur {
         nombreAtoutsInfs = 0;
         excusePassee = excusePasseePli;
         calculateurDeType(carteGagnante);
+        //Sélectionne la stratégie en fonction du niveau du joueur
         switch (niveauJoueur) {
             case 1:
                 return jouerCarteAuHasard(couleurDemandee, carteGagnante);
@@ -60,8 +63,10 @@ public class Joueur {
     private Carte jouerCarteAuHasard(String couleurDemandee, Carte carteGagnante) {
         Carte carteJouee = null;
 
+        //Continue à choisir une carte au hasard jusqu'à ce qu'une carte valide soit sélectionnée
         for (;;) {
             carteJouee = mainJoueur.get(rand.nextInt(mainJoueur.size()));
+            //Vérifie la validité de la carte en fonction du contexte du pli
             if (!excusePassee) {
                 if (isValidCard(carteJouee, couleurDemandee, carteGagnante)) {
                     System.out.println("Le " + nomJoueur + " joue: " + carteJouee.nomCarte);
@@ -74,14 +79,16 @@ public class Joueur {
                 }
             }
         }
+        //Verifie si l'excuse est passée
         if (carteJouee.getNom().equals("Excuse")) {
             excusePassee = true;
         }
-
+        //Retire la carte jouée de la main du joueur
         mainJoueur.remove(carteJouee);
         return carteJouee;
     }
 
+    //Méthode vérifiant la validité d'une carte
     private boolean isValidCard(Carte carteJouee, String couleurDemandee, Carte carteGagnante) {
         if (couleurDemandee != null) {
             if (carteJouee.typeCarte.equals("Excuse")) {
