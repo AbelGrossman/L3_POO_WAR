@@ -22,12 +22,14 @@ public class Pli {
     Random rand = new Random();
     public Map<String, Joueur> petitMap = new HashMap<>();
 
+    //Création d'un pli avec les joueurs et un indicateur pour savoir si l'excuse a été jouée
     public Pli(List<Joueur> joueurs, Boolean excusePasseeManche) {
         this.joueurs = joueurs;
         excusePassee = excusePasseeManche;
         jouerPli();
     }
 
+    //méthode pour jouer un pli
     public void jouerPli() {
         this.couleurDemandee = null;
         this.carteGagnante = null;
@@ -35,12 +37,11 @@ public class Pli {
         this.cartesJouees = new ArrayList<>();
         Map<String, Joueur> excuseMap = new HashMap<>();
         Carte carteExcuse = null;
+        //parcours des joueurs pour jouer une carte chacun
         for (Joueur joueur : joueurs) {
-            // for (Carte d : joueur.mainJoueur) {
-            // System.out.println(d.nomCarte);
-            // }
             Carte carteJouee = joueur.jouerCarte(this.couleurDemandee, this.carteGagnante, excusePassee);
             excusePassee = joueur.excusePassee;
+            //voir si l'excuse est jouée
             if (carteJouee.nomCarte.equals("Excuse")) {
                 excuseMap.put("Excuse", joueur);
                 carteExcuse = carteJouee;
@@ -48,16 +49,17 @@ public class Pli {
             if (carteJouee.nomCarte.equals("1 d'Atout")) {
                 petitMap.put("1 d'Atout", joueur);
             }
+            // Ajout de la carte jouée à la liste des cartes du pli
             cartesJouees.add(carteJouee);
-            // Déterminer la couleur demandée s'il s'agit de la première carte du pli
+            //On détermine la couleur demandée
             if (couleurDemandee == null) {
                 couleurDemandee = carteJouee.getType();
+                //exception pour l'excuse
                 if (couleurDemandee.equals("Excuse")) {
                     couleurDemandee = null;
                 }
             }
-
-            // Déterminer la carte gagnante du pli
+            //On détermine la carte gagnante et donc le joueur gagnant 
             if (estCarteGagnante(carteJouee)) {
                 carteGagnante = carteJouee;
                 joueurGagnant = joueur;
@@ -65,6 +67,7 @@ public class Pli {
                         "Le " + joueur.nomJoueur + " qui est " + joueur.roleJoueur + ", est gagnant.");
             }
         }
+        //voir si seulement des atouts sont joués dans un pli, sert pour plus tard
         Boolean queDesAtouts = true;
         for (Carte i : cartesJouees) {
             System.out.println("cartes jouees: " + i.getNom());
@@ -72,8 +75,13 @@ public class Pli {
                 queDesAtouts = false;
             }
         }
+
+        //Règle spéciale : permutation des cartes
         List<Carte> cartesPermutees = new ArrayList<>();
+
+        //si tous les joueurs ont joué des Atouts et qu'ils ont au moins 2 cartes dans leur main
         if (queDesAtouts && joueurs.get(0).mainJoueur.size() >= 2) {
+            //Echange de deux cartes Atouts entre chaque joueur
             for (int i = 0; i < joueurs.size(); i++) {
                 List<Carte> mainDuJoueur = joueurs.get(i).mainJoueur;
                 Carte carte1 = mainDuJoueur.get(rand.nextInt(mainDuJoueur.size()));
@@ -85,6 +93,7 @@ public class Pli {
                 System.out.println("Le " + joueurs.get(i).nomJoueur + " echange les cartes " + carte1.getNom() + " et "
                         + carte2.getNom());
             }
+            //Permutation des cartes
             if (joueurs.size() == 3) {
                 joueurs.get(0).mainJoueur.add(cartesPermutees.get(4));
                 joueurs.get(0).mainJoueur.add(cartesPermutees.get(5));
@@ -102,13 +111,18 @@ public class Pli {
                 joueurs.get(3).mainJoueur.add(cartesPermutees.get(2));
                 joueurs.get(3).mainJoueur.add(cartesPermutees.get(3));
             }
+            //Re-trie des mains des joueurs
             for (Joueur j : joueurs) {
                 Collections.sort(j.mainJoueur, Comparator.comparing(Carte::getValeur));
                 Collections.sort(j.mainJoueur, Comparator.comparing(Carte::getType));
             }
         }
 
+        //Gestion de l'excuse
+        //verifie si l'excuse est jouée et que le rôle du joueur gagnant du pli n'est pas le même que le rôle du joueur ayant joué l'excuse 
         if (carteExcuse != null && !joueurGagnant.roleJoueur.equals(excuseMap.get("Excuse").roleJoueur)) {
+
+        //Determine si c'est l'attaque ou la defense qui a joué l'excuse
             if (excuseMap.get("Excuse").roleJoueur.equals("Attaquant")) {
                 Manche.pliAttaque.add(carteExcuse);
                 Manche.donALaDefense = true;
@@ -116,9 +130,10 @@ public class Pli {
                 Manche.pliDefense.add(carteExcuse);
                 Manche.donALAttaque = true;
             }
+            //on l'enleve des cartes jouées pour que son traitement spécial soit correctement géré.
             cartesJouees.remove(carteExcuse);
         }
-        // À la fin du pli, attribuer le pli à l'équipe gagnante
+        //On attribue le pli à l'équipe gagnante
         if ("Attaquant".equals(joueurGagnant.roleJoueur)) {
             Manche.pliAttaque.addAll(cartesJouees);
             System.out.println("ajout des cartes au pli attaquant");
@@ -129,8 +144,7 @@ public class Pli {
     }
 
     private boolean estCarteGagnante(Carte carte) {
-        // Si la première carte du pli est jouée, elle définit la couleur demandée et
-        // gagne par défaut
+        //La première carte du pli jouée définit la couleur demandée et gagne par défaut
         if (carte.nomCarte.equals("Excuse")) {
             return false;
         }
@@ -138,8 +152,7 @@ public class Pli {
             return true;
         }
 
-        // Si la carte jouée est un atout et que la carte gagnante actuelle n'en est pas
-        // un, ou si elle est d'une valeur supérieure
+        //Si la carte jouée est un atout et que la carte gagnante actuelle n'en est pas un, ou si elle est d'une valeur supérieure
         if (!excusePassee) {
             if (carte.getType().equals("Atout")) {
                 return !carteGagnante.getType().equals("Atout") || carte.getValeur() > carteGagnante.getValeur();
@@ -150,17 +163,14 @@ public class Pli {
             }
         }
 
-        // Si la carte jouée suit la couleur demandée et a une valeur plus élevée que la
-        // carte gagnante actuelle
+        //Si la carte jouée suit la couleur demandée et a une valeur plus élevée que la carte gagnante actuelle, elle devient carte gagnante
         if (carte.getType().equals(couleurDemandee)) {
             return carte.getValeur() > carteGagnante.getValeur();
         }
-
-        // La carte gagnante actuelle reste gagnante
         return false;
     }
 
-    // Accesseurs et autres méthodes utiles
+    //getters et setters utiles
     public Joueur getJoueurGagnant() {
         return joueurGagnant;
     }
