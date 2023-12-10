@@ -8,11 +8,13 @@ import java.util.HashMap;
 import java.util.Random;
 
 public class Partie {
+    //On déclare des joueurs pour la partie
     public Joueur joueur1Partie;
     public Joueur joueur2Partie;
     public Joueur joueur3Partie;
     public Joueur joueur4Partie;
 
+    //On déclare des joueurs pour les manches
     public Joueur joueur1Manche;
     public Joueur joueur2Manche;
     public Joueur joueur3Manche;
@@ -20,6 +22,7 @@ public class Partie {
 
     public List<Carte> deckMelangePartie;
 
+    //Pas compris à quoi servent les 4 mains
     List<Carte> main1Partie = new ArrayList<>();
     List<Carte> main2Partie = new ArrayList<>();
     List<Carte> main3Partie = new ArrayList<>();
@@ -30,8 +33,11 @@ public class Partie {
     public int typeChien;
     public Joueur joueurGagnant;
 
+    //Constructeur d'une partie avec comme argument le nombre de joueurs, le jeu au complet et le nombre de manches
     public Partie(int nombreJoueurs, Deck deckTarot, int nombreDeManches) {
+        //Mélange du deck car il est pour l'instant triée dans l'ordre
         melangeDuDeck(deckTarot);
+        //Création des joueurs
         joueur1Partie = new Joueur("Joueur 1", main1Partie, 0, 1);
         joueur2Partie = new Joueur("Joueur 2", main2Partie, 0, 1);
         joueur3Partie = new Joueur("Joueur 3", main3Partie, 0, 1);
@@ -45,28 +51,37 @@ public class Partie {
             joueurs.add(joueur4Partie);
 
         }
-
+        //On initialise des joueurs pour la 1ere manche 
+        //Si tu peux expliquer juste pourquoi faut créer un joueur diff à chaque manche c'est carré
         joueur1Manche = joueur1Partie;
         joueur2Manche = joueur2Partie;
         joueur3Manche = joueur3Partie;
         joueur4Manche = joueur4Partie;
+        //boucle pour le nombre de manches
         for (int i = 0; i < nombreDeManches; i++) {
             selectionChien(nombreJoueurs);
             System.out.println();
             System.out.println();
+            //Affichage numéro de manches
             int numeroManche = i + 1;
             System.out.println("Debut de la manche " + numeroManche);
             System.out.println();
             System.out.println();
+
+            //On initialise les mises des joueurs à 0
             misesPartie.put(joueur1Partie, 0);
             misesPartie.put(joueur2Partie, 0);
             misesPartie.put(joueur3Partie, 0);
             misesPartie.put(joueur4Partie, 0);
+
+            //Boucle jusqu'à ce que tous les joueurs aient misé (0 = pas de mise)
             while (misesPartie.get(joueur1Manche) == 0 && misesPartie.get(joueur2Manche) == 0
                     && misesPartie.get(joueur3Manche) == 0 && misesPartie.get(joueur4Manche) == 0) {
+                        //Création d'une manche suite à la mise
                 Manche manche = new Manche(joueur1Manche, joueur2Manche, joueur3Manche, joueur4Manche,
                         deckMelangePartie,
                         typeChien);
+                //Attribution des mises en fonction du choix de chaque joueur
                 for (Joueur j : joueurs) {
                     switch (j.miseJoueur) {
                         case "Garde Contre":
@@ -86,10 +101,14 @@ public class Partie {
                             break;
                     }
                 }
+                //On nettoye les mains des joueurs pour la prochaine manche
                 joueur1Manche.mainJoueur.clear();
                 joueur2Manche.mainJoueur.clear();
                 joueur3Manche.mainJoueur.clear();
                 manche.packetChien.clear();
+
+                // Rotation des joueurs pour la prochaine manche
+                //le distributeur se décale
                 swap = joueur1Manche;
                 joueur1Manche = joueur2Manche;
                 joueur2Manche = joueur3Manche;
