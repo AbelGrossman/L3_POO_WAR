@@ -124,6 +124,7 @@ public class Partie {
             System.out.println("Points j3: " + joueur3Partie.pointsJoueur);
             //System.out.println("Points j4: " + joueur4Partie.pointsJoueur);
         }
+        //On détermine le joueur gagnant de la partie en fonction des points
         if (nombreJoueurs == 3) {
             if (joueur1Partie.pointsJoueur > joueur2Partie.pointsJoueur
                     && joueur1Partie.pointsJoueur > joueur3Partie.pointsJoueur) {
@@ -156,11 +157,13 @@ public class Partie {
         }
     }
 
+    //on mélange le deck
     public void melangeDuDeck(Deck deckTarot) {
         Collections.shuffle(deckTarot.deckComplet);
         deckMelangePartie = deckTarot.deckComplet;
     }
 
+    //On sélectionne le type de chien en fonction du nombre de joueurs et surtout au hasard (règle spéciale)
     public void selectionChien(int nombreJoueurs) {
         if (nombreJoueurs == 3) {
             int randomValue = rand.nextInt(3);
