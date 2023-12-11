@@ -644,6 +644,7 @@ public class Manche {
 
     public void gestionDuChien() {
         System.out.println("type chien: " + typeChien + ". Taille packet chien: " + packetChien.size());
+
         if (attaquant.miseJoueur.equals("Petite") || attaquant.miseJoueur.equals("Garde")) {
             for (Joueur i : joueurs) {
                 if (i != attaquant) {
@@ -709,29 +710,40 @@ public class Manche {
                 .sorted(Comparator.comparingInt(Map.Entry::getValue))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
+
         List<Carte> mainAttaquant = attaquant.mainJoueur;
         int i = 0;
-        boolean couleurPassee = false;
+        System.out.println(mainAttaquant.size());
+        for (Carte c : mainAttaquant) {
+            System.out.println(c.getNom());
+        }
+        for (String s : typeCartesOrdonne) {
+            System.out.println(s);
+        }
         int nombrePassages = 0;
         String couleurActuelle = mainAttaquant.get(i).getType();
         while (pliAttaque.size() != packetChien.size()) {
             if (i < mainAttaquant.size()) {
+                System.out.println("couleur check: " + i);
                 couleurActuelle = mainAttaquant.get(i).getType();
             }
-            if (couleurPassee && !mainAttaquant.get(i - 1).getType().equals(typeCartesOrdonne.get(0))) {
+
+            if (i - 1 == mainAttaquant.size()) {
+                System.out.println("pre-swapping: " + i);
                 typeCartesOrdonne.set(0, typeCartesOrdonne.get(1));
                 typeCartesOrdonne.set(1, typeCartesOrdonne.get(2));
                 typeCartesOrdonne.set(2, typeCartesOrdonne.get(3));
-                couleurPassee = false;
+                System.out.println("swapping: " + i);
                 nombrePassages++;
                 i = 0;
                 continue;
             }
+
             if (i < mainAttaquant.size() && !couleurActuelle.equals("Atout")
                     && mainAttaquant.get(i).valeurCarte != 14
                     && couleurActuelle.equals(typeCartesOrdonne.get(0))
                     && pliAttaque.size() < packetChien.size()) {
-                couleurPassee = true;
+                System.out.println("went in: " + i);
                 if (mainAttaquant.get(i).valeurCarte > 10) {
                     switch (mainAttaquant.get(i).valeurCarte) {
                         case 11:
@@ -848,6 +860,7 @@ public class Manche {
                             break;
                     }
                 } else {
+                    System.out.println("else case");
                     pliAttaque.add(mainAttaquant.get(i));
                     mainAttaquant.remove(i);
                     continue;
@@ -855,6 +868,7 @@ public class Manche {
 
             }
             if (nombrePassages == 4) {
+                System.out.println("final: " + i);
                 i = 0;
                 for (;;) {
                     if (!mainAttaquant.get(i).typeCarte.equals("Atout")
@@ -878,7 +892,7 @@ public class Manche {
     public void gestionDuDon() {
         Carte carteDonnee = null;
         if (donALAttaque && !excuseALaFin) {
-            System.out.println("Dont à l'attaque de: ");
+            System.out.println("Don à l'attaque de: ");
             do {
                 carteDonnee = pliDefense.get(rand.nextInt(pliDefense.size()));
             } while (carteDonnee.pointsCarte != 1);
@@ -886,7 +900,7 @@ public class Manche {
             pliAttaque.remove(carteDonnee);
             pliAttaque.add(carteDonnee);
         } else if (donALaDefense) {
-            System.out.println("Dont à la defense de: ");
+            System.out.println("Don à la defense de: ");
             do {
                 carteDonnee = pliAttaque.get(rand.nextInt(pliAttaque.size()));
             } while (carteDonnee.pointsCarte != 1);

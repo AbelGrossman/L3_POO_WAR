@@ -43,7 +43,6 @@ public class Partie {
         if (nombreJoueurs == 4) {
             joueur4Partie = new Joueur("Joueur 4", main4Partie, 0, 1);
             joueurs.add(joueur4Partie);
-
         }
 
         joueur1Manche = joueur1Partie;
@@ -100,10 +99,13 @@ public class Partie {
                     joueur4Manche = swap;
                 }
             }
-            System.out.println("Points j1: " + joueur1Partie.pointsJoueur);
-            System.out.println("Points j2: " + joueur2Partie.pointsJoueur);
-            System.out.println("Points j3: " + joueur3Partie.pointsJoueur);
-            //System.out.println("Points j4: " + joueur4Partie.pointsJoueur);
+            List<Integer> scoreFinaux=new ArrayList();
+            System.out.println("Points du Joueur 1: " + joueur1Partie.pointsJoueur);
+            System.out.println("Points du Joueur 2: " + joueur2Partie.pointsJoueur);
+            System.out.println("Points du Joueur 3: " + joueur3Partie.pointsJoueur);
+            if (nombreJoueurs == 4) {
+                System.out.println("Points du Joueur 4: " + joueur4Partie.pointsJoueur);
+            }
         }
         if (nombreJoueurs == 3) {
             if (joueur1Partie.pointsJoueur > joueur2Partie.pointsJoueur
@@ -135,6 +137,7 @@ public class Partie {
                 joueurGagnant = joueur4Partie;
             }
         }
+        System.out.println("Le "+joueurGagnant+" remporte la partie!");
     }
 
     public void melangeDuDeck(Deck deckTarot) {

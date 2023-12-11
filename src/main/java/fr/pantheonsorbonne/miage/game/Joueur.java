@@ -3,7 +3,6 @@ package fr.pantheonsorbonne.miage.game;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Joueur {
@@ -47,12 +46,9 @@ public class Joueur {
             case 1:
                 return jouerCarteAuHasard(couleurDemandee, carteGagnante);
             case 2:
-                return jouerStrategieDeBase(couleurDemandee, carteGagnante);
-            case 3:
                 return jouerStrategieAvancee(couleurDemandee, carteGagnante);
             default:
-                return jouerCarteAuHasard(couleurDemandee, carteGagnante); // Fallback au hasard si le niveau n'est pas
-                                                                           // défini
+                return jouerCarteAuHasard(couleurDemandee, carteGagnante);
         }
     }
 
@@ -78,6 +74,23 @@ public class Joueur {
             excusePassee = true;
         }
 
+        mainJoueur.remove(carteJouee);
+        return carteJouee;
+    }
+
+    // Stratégie avancée pour le bot "smart"
+    // Ca jvais finir mais ca va etre chaud de faire un truc hyper intelligent
+    private Carte jouerStrategieAvancee(String couleurDemandee, Carte carteGagnante) {
+        // Implémenter une stratégie avancée ici
+        // Par exemple, utiliser un algorithme Minimax pour anticiper les coups
+        // Pour l'exemple, on retourne simplement la carte la plus basse
+        Carte carteJouee=null;
+        for(Carte c:mainJoueur){
+            carteJouee=c;
+            if(c.getNom().equals("9 de Coeur")){
+                break;
+            }
+        }
         mainJoueur.remove(carteJouee);
         return carteJouee;
     }
@@ -174,25 +187,7 @@ public class Joueur {
         return false;
     }
 
-    // Stratégie de base pour le bot "normal"
-    private Carte jouerStrategieDeBase(String couleurDemandee, Carte carteGagnante) {
-        // Implémenter une stratégie de base ici
-        // Par exemple, jouer la carte de la plus haute valeur
-        Carte carteJouee = null;
-        mainJoueur.remove(carteJouee);
-        return carteJouee;
-    }
-
-    // Stratégie avancée pour le bot "smart"
-    // Ca jvais finir mais ca va etre chaud de faire un truc hyper intelligent
-    private Carte jouerStrategieAvancee(String couleurDemandee, Carte carteGagnante) {
-        // Implémenter une stratégie avancée ici
-        // Par exemple, utiliser un algorithme Minimax pour anticiper les coups
-        // Pour l'exemple, on retourne simplement la carte la plus basse
-        Carte carteJouee = null;
-        mainJoueur.remove(carteJouee);
-        return carteJouee;
-    }
+    
 
     public void calculateurDeType(Carte carteGagnante) {
         nombreCarteCouleurDansMain.put("Trefle", 0);
