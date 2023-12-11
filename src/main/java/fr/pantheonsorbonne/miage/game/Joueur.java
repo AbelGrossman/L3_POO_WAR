@@ -79,12 +79,10 @@ public class Joueur {
             // Vérifie la validité de la carte en fonction du contexte du pli
             if (!excusePassee) {
                 if (isValidCard(carteJouee, couleurDemandee, carteGagnante)) {
-                    System.out.println("Le " + nomJoueur + " joue: " + carteJouee.nomCarte);
                     break;
                 }
             } else {
                 if (isValidCard2(carteJouee, couleurDemandee, carteGagnante)) {
-                    System.out.println("Le " + nomJoueur + " joue: " + carteJouee.nomCarte);
                     break;
                 }
             }
@@ -122,20 +120,17 @@ public class Joueur {
         if (couleurDemandee != null) {
             // On peut jouer l'excuse quand on veut, sans conditions
             if (carteJouee.typeCarte.equals("Excuse")) {
-                System.out.println("case 1");
                 return true;
             }
             // Si la carte est de la couleur demandée et n'est pas un atout alors elle est
             // valide
             if (carteJouee.typeCarte.equals(couleurDemandee) && !carteJouee.typeCarte.equals("Atout")) {
-                System.out.println("case 2");
                 return true;
             }
             // Si la carte est un atout mais pas de la couleur demandée et si le joueur n'a
             // pas de cartes de la couleur demandée alors elle est valide
             if (carteJouee.typeCarte.equals("Atout") && !carteJouee.typeCarte.equals(couleurDemandee)
                     && nombreCarteCouleurDansMain.get(couleurDemandee) == 0) {
-                System.out.println("case 3");
                 return true;
             }
             // Si la carte est de la couleur demandée, est un atout et a une valeur
@@ -143,14 +138,12 @@ public class Joueur {
             if (carteJouee.typeCarte.equals(couleurDemandee) && carteJouee.typeCarte.equals("Atout")
                     && (carteJouee.valeurCarte > carteGagnante.valeurCarte
                             || nombreAtoutsSups == 0)) {
-                System.out.println("case 4");
                 return true;
             }
             // Si la carte n'est pas de la couleur demandée, que la couleur demandée est un
             // atout et que le joueur n'a pas d'atouts alors elle est valide
             if (!carteJouee.typeCarte.equals(couleurDemandee) && couleurDemandee.equals("Atout")
                     && nombreCarteCouleurDansMain.get(couleurDemandee) == 0) {
-                System.out.println("case 5");
                 return true;
             }
             // Si la couleur demandée n'est pas un atout, que la carte n'est pas de la
@@ -159,7 +152,6 @@ public class Joueur {
             if (!couleurDemandee.equals("Atout") && (!carteJouee.typeCarte.equals(couleurDemandee)
                     && nombreCarteCouleurDansMain.get("Atout") == 0
                     && nombreCarteCouleurDansMain.get(couleurDemandee) == 0)) {
-                System.out.println("case 6");
                 return true;
 
             }
@@ -177,16 +169,13 @@ public class Joueur {
             // Si l'excuse est la carte gagnante, cad qu'aucune autre carte n'a été jouée,
             // on peut jouer ce qu'on veut.
             if (carteGagnante.typeCarte.equals("Excuse")) {
-                System.out.println("case 1");
                 return true;
             }
             if (carteJouee.typeCarte.equals(couleurDemandee) && !carteJouee.typeCarte.equals("Atout")) {
-                System.out.println("case 2");
                 return true;
             }
             if (carteJouee.typeCarte.equals("Atout") && !carteJouee.typeCarte.equals(couleurDemandee)
                     && nombreCarteCouleurDansMain.get(couleurDemandee) == 0) {
-                System.out.println("case 3");
                 return true;
             }
 
@@ -195,19 +184,16 @@ public class Joueur {
             if (carteJouee.typeCarte.equals(couleurDemandee) && carteJouee.typeCarte.equals("Atout")
                     && (carteJouee.valeurCarte < carteGagnante.valeurCarte
                             || nombreAtoutsInfs == 0)) {
-                System.out.println("case 4");
                 return true;
             }
 
             if (!carteJouee.typeCarte.equals(couleurDemandee) && couleurDemandee.equals("Atout")
                     && nombreCarteCouleurDansMain.get(couleurDemandee) == 0) {
-                System.out.println("case 5");
                 return true;
             }
             if (!couleurDemandee.equals("Atout") && (!carteJouee.typeCarte.equals(couleurDemandee)
                     && nombreCarteCouleurDansMain.get("Atout") == 0
                     && nombreCarteCouleurDansMain.get(couleurDemandee) == 0)) {
-                System.out.println("case 6");
                 return true;
 
             }
