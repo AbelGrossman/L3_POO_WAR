@@ -29,7 +29,7 @@ public class Deck {
             points = 1;
             for (int j = 1; j < 15; j++) {
                 switch (j) {
-                    // Assigner des noms et points spéciaux aux têtes.
+                    //on assigne des noms et points spéciaux aux têtes.
                     case 11:
                         nom = "Valet de " + type;
                         points = 2;
@@ -50,7 +50,7 @@ public class Deck {
                         nom = j + " de " + type;
                         break;
                 }
-                // Ajouter la carte créée au deck.
+                //On ajoute la carte au deck
                 Carte nouvelleCarte = new Carte(type, j, nom, bout, points);
                 deckComplet.add(nouvelleCarte);
             }

@@ -305,16 +305,13 @@ public class Manche {
                     }
                 }
             }
-            // Conditions du type de prise basées sur le nombre de bouts, le nombre de rois
-            // et le nombre d'atouts
-            // Meme logique jusqu'a la ligne 436 nous avons adapté les prises en fonction du
-            // nombre de bouts de rois et d'atouts qui sont les cartes les plus importantes
-            // pour gagner une partie
+            // Conditions du type de prise basées sur le nombre de bouts, le nombre de rois et le nombre d'atouts
+            // Meme logique jusqu'a la ligne 457 nous avons adapté les prises en fonction du
+            // nombre de bouts de rois et d'atouts qui sont les cartes les plus importantes pour gagner une partie
             if (countBout == 3) {
                 if (countRoi >= 1) {
                     if (countAtout >= 6) {
-                        // Si on a les 3 bouts, 1 roi ou plus et 6 atouts ou plus on fait une Garde
-                        // Contre
+                        //Si on a les 3 bouts, 1 roi ou plus et 6 atouts ou plus on fait une Garde Contre
                         System.out.println("case 5!");
                         return GC;
                     } else if (conteurDeMises.get(GS) != 1) {
@@ -458,6 +455,7 @@ public class Manche {
         return P1;
     }
 
+    //Méthode pour compter le nombre de cartes spéciales (une carte "spéciale" est soit un bout, soit un roi, soit un atout)
     public int[] nombreCartesSpeciales(Joueur joueur, List<Carte> main) {
         int[] cartesSpeciales = new int[3];
         for (int i = 0; i < main.size(); i++) {
@@ -476,16 +474,21 @@ public class Manche {
     }
 
     public void distributionQuatreJoueurs() {
+        // Rotation aléatoire du deck mélangé
         Collections.rotate(deckMelange, deckMelange.size() / (rand.nextInt(4) + 1));
         int countJ1 = 0;
         int countJ2 = 0;
         int countJ3 = 0;
         int countJ4 = 0;
+        //indices pour parcourir le deck
         int i = 0;
         int count = 0;
+        //Boucle infinie (break à la fin de la distribution)
         for (;;) {
+            // Distribution des cartes aux joueurs en fonction du compteur
             if (countJ1 == countJ2) {
                 for (int j = 0; j < 3; j++) {
+                    //Ajoute la carte du deck mélangé à la main du deuxième joueur et incrémente l'indice pour la prochaine carte
                     joueur2.mainJoueur.add(deckMelange.get(i++));
                 }
                 countJ2++;
@@ -509,6 +512,7 @@ public class Manche {
                 countJ1++;
             }
             count++;
+            // Distribution du chien en fonction de typeChien
             if (count % 2 == 0 && count <= 12) {
                 if (typeChien == 6 || typeChien == 10) {
                     packetChien.add(deckMelange.get(i++));
@@ -517,10 +521,12 @@ public class Manche {
                     packetChien.add(deckMelange.get(i++));
                 }
             }
+            //Condition de sortie de la boucle,  20 cartes par joueur
             if (count == 20)
                 break;
         }
 
+        //Distribution des cartes restantes en fonction de typeChien
         if (typeChien == 10) {
             while (i < 72) {
                 joueur2.mainJoueur.add(deckMelange.get(i++));
@@ -567,6 +573,7 @@ public class Manche {
         }
     }
 
+    //Meme logique que pour la distributionQuatreJoueurs
     public void distributionTroisJoueurs() {
         Collections.rotate(deckMelange, deckMelange.size() / (rand.nextInt(4) + 1));
         int countJ1 = 0;
@@ -642,15 +649,19 @@ public class Manche {
         }
     }
 
+    //méthode de gestion du chien
     public void gestionDuChien() {
         System.out.println("type chien: " + typeChien + ". Taille packet chien: " + packetChien.size());
 
+        //Vérifie la mise du joueur attaquant pour déterminer le traitement du chien car on ne regarde pas le chien si GC ou GS
         if (attaquant.miseJoueur.equals("Petite") || attaquant.miseJoueur.equals("Garde")) {
             for (Joueur i : joueurs) {
                 if (i != attaquant) {
+                    //Trie les mains des défenseurs par valeur et type de carte
                     Collections.sort(i.mainJoueur, Comparator.comparing(Carte::getValeur));
                     Collections.sort(i.mainJoueur, Comparator.comparing(Carte::getType));
                 }
+                //Trie la main du joueur attaquant pour choisir quelles cartes mettrent dans le chien
                 if (i == attaquant) {
                     i.roleJoueur = "Attaquant";
                     i.mainJoueur.addAll(packetChien);
@@ -676,16 +687,20 @@ public class Manche {
     }
 
     public void getCouleursDansMain(Joueur joueur) {
-        int t = 0;
-        int p = 0;
-        int c = 0;
-        int c2 = 0;
+        //Initialise les compteurs pour chaque couleur
+        int t = 0;  //trefle
+        int p = 0;  //pique
+        int c = 0;  //coeur
+        int c2 = 0; //carreau
         for (Carte i : joueur.mainJoueur) {
+            //Switch pour traiter chaque type de carte
             switch (i.typeCarte) {
+                //Enregistre la valeur de la carte dans le dictionnaire des Trefles et met à jour le compteur
                 case "Trefle":
                     joueur.treflesDansMain.put(i.valeurCarte, true);
                     joueur.nombreCarteCouleurDansMain.put(i.typeCarte, t++);
                     break;
+                //meme logique pour pique et ainsi de suite
                 case "Pique":
                     joueur.piquesDansMain.put(i.valeurCarte, true);
                     joueur.nombreCarteCouleurDansMain.put(i.typeCarte, p++);
@@ -703,33 +718,27 @@ public class Manche {
             }
         }
     }
-
+    //Méthode permettant de choisir une liste de carte à défausser suite à la prise du chien
     public List<Carte> defausserCartes(Joueur attaquant) {
+        //Obtient une liste ordonnée des couleurs dans la main de l'attaquant (à l'exception des atouts)
         List<String> typeCartesOrdonne = attaquant.nombreCarteCouleurDansMain.entrySet().stream()
                 .filter(entry -> !entry.getKey().equals("Atout"))
                 .sorted(Comparator.comparingInt(Map.Entry::getValue))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
-
-        List<Carte> mainAttaquant = attaquant.mainJoueur;
-        int i = 0;
-        System.out.println(mainAttaquant.size());
-        for (Carte c : mainAttaquant) {
-            System.out.println(c.getNom());
-        }
-        for (String s : typeCartesOrdonne) {
-            System.out.println(s);
-        }
-        int nombrePassages = 0;
+        List<Carte> mainAttaquant = attaquant.mainJoueur; //Récupère la main de l'attaquant
+        int i = 0;  //Indique si la couleur a déjà été traitée
+        boolean couleurPassee = false; //Indique si la couleur a déjà été traitée
+        int nombrePassages = 0; //Compteur de passages pour changer la couleur si nécessaire
         String couleurActuelle = mainAttaquant.get(i).getType();
+        //Continue la défausse tant que le pli de l'attaquant n'est pas complet
         while (pliAttaque.size() != packetChien.size()) {
             if (i < mainAttaquant.size()) {
-                System.out.println("couleur check: " + i);
-                couleurActuelle = mainAttaquant.get(i).getType();
+                couleurActuelle = mainAttaquant.get(i).getType(); // Met à jour la couleur actuelle
             }
-
-            if (i - 1 == mainAttaquant.size()) {
-                System.out.println("pre-swapping: " + i);
+            //condition pour changer la couleur si la précédente a été passée
+            if (couleurPassee && !mainAttaquant.get(i - 1).getType().equals(typeCartesOrdonne.get(0))) {
+                //Reorganise la liste des couleurs pour passer à la suivante
                 typeCartesOrdonne.set(0, typeCartesOrdonne.get(1));
                 typeCartesOrdonne.set(1, typeCartesOrdonne.get(2));
                 typeCartesOrdonne.set(2, typeCartesOrdonne.get(3));
@@ -738,13 +747,15 @@ public class Manche {
                 i = 0;
                 continue;
             }
-
+            //Condition pour défausser une carte si elle correspond aux critères
             if (i < mainAttaquant.size() && !couleurActuelle.equals("Atout")
                     && mainAttaquant.get(i).valeurCarte != 14
                     && couleurActuelle.equals(typeCartesOrdonne.get(0))
                     && pliAttaque.size() < packetChien.size()) {
-                System.out.println("went in: " + i);
+                couleurPassee = true;
+                //Vérifie si la carte est une tête et si elle peut être défaussée
                 if (mainAttaquant.get(i).valeurCarte > 10) {
+                    //Switch pour gérer les différents cas des têtes
                     switch (mainAttaquant.get(i).valeurCarte) {
                         case 11:
                             switch (couleurActuelle) {
@@ -867,6 +878,7 @@ public class Manche {
                 }
 
             }
+            //Quand toutes les couleurs sont passées on passse aux atouts
             if (nombrePassages == 4) {
                 System.out.println("final: " + i);
                 i = 0;
@@ -884,21 +896,28 @@ public class Manche {
                     i++;
                 }
             }
-            i++;
+            i++;    //Passe à la carte suivante dans la main
         }
         return mainAttaquant;
     }
 
+    //Méthode pour gérer le don d'une carte suite au placement de l'excuse
     public void gestionDuDon() {
         Carte carteDonnee = null;
+        //Si le don est à l'attaque et qu'il n'y a pas d'Excuse à la fin du pli
         if (donALAttaque && !excuseALaFin) {
             System.out.println("Don à l'attaque de: ");
+            //Sélectionne une carte de la défense de façon aléatoire jusqu'à obtenir une carte de valeur 1
             do {
                 carteDonnee = pliDefense.get(rand.nextInt(pliDefense.size()));
             } while (carteDonnee.pointsCarte != 1);
             System.out.println(carteDonnee.nomCarte);
+
+            //Retire la carte donnée du pli de l'attaque et l'ajoute au pli de l'attaque
             pliAttaque.remove(carteDonnee);
             pliAttaque.add(carteDonnee);
+
+        //Si le don est à la defense
         } else if (donALaDefense) {
             System.out.println("Don à la defense de: ");
             do {
@@ -916,6 +935,7 @@ public class Manche {
         while (pliComptagePoints.size() < taillePliAttaque) {
             int nombreDe1 = 0;
             int nombreDeSpeciales = 0;
+            //On compte le nombre de carte de valeur 1 et les cartes spéciales
             for (Carte i : pliAttaque) {
                 if (i.getPoints() == 1) {
                     nombreDe1++;
@@ -923,11 +943,13 @@ public class Manche {
                     nombreDeSpeciales++;
                 }
             }
+            //Si le pli ne contient que des cartes avec 1 point ou que des cartes spéciales, on ajoute toutes les cartes au comptage
             if (nombreDe1 == 0 || nombreDeSpeciales == 0) {
                 for (Carte i : pliAttaque) {
                     pliComptagePoints.add(i);
                 }
             }
+            //On ajoute les cartes spéciales avec 1 point au comptage
             for (int i = 0; i < pliAttaque.size(); i++) {
                 if (i > 0 && (pliAttaque.get(i - 1).getPoints() == 1 || pliAttaque.get(i).getPoints() == 1)
                         && pliAttaque.get(i - 1).getPoints() != pliAttaque.get(i).getPoints()) {
@@ -943,13 +965,14 @@ public class Manche {
                 }
             }
         }
+        // Appel de la méthode pour le comptage final des points
         comptageDesPoints(pliComptagePoints);
     }
 
     public void comptageDesPoints(List<Carte> pliComptagePoints) {
-        int difference = 0;
+        int difference = 0; //Différence de points entre l'attaquant et le score à faire
         int mise = 0;
-        int victoireDefense = 1;
+        int victoireDefense = 1;    //variable de victoire/défaite de la défense (-1 si l'attaque gagne)
         int nombrePointsPliAttaquant = 0;
         switch (attaquant.miseJoueur) {
             case "Garde Contre":
@@ -972,6 +995,7 @@ public class Manche {
                 mise = 1;
                 break;
         }
+        // Calcul du nombre total de points dans le pli de l'attaque
         for (int i = 0; i < pliComptagePoints.size(); i += 2) {
             int max = pliComptagePoints.get(i).getPoints();
             if (i < pliComptagePoints.size() - 1 && (max < pliComptagePoints.get(i + 1).getPoints())) {
@@ -981,16 +1005,21 @@ public class Manche {
         }
         System.out.println("nombre de points dans le pli attaquant: " + nombrePointsPliAttaquant);
         System.out.println("Score à réaliser: " + scoreARealiser);
+
+         //Calcul de la différence de points par rapport au score à réaliser
         difference = Math.abs(nombrePointsPliAttaquant - scoreARealiser);
         System.out.println("Différence de score: " + difference);
+        
         if (nombrePointsPliAttaquant >= scoreARealiser) {
             victoireDefense = -1;
             System.out.println("L'attaquant, qui est le " + attaquant.nomJoueur + ", gagne!");
         } else {
             System.out.println("L'attaquant, qui est le " + attaquant.nomJoueur + ", chute!");
         }
+        //Calcul du nombre total de points gagner suite à la fin de la manche
         nombrePointsTotal = ((25 + difference) * mise);
         System.out.println("nombre de points total: " + nombrePointsTotal);
+        //Attribution des points aux joueurs en fonction du résultat
         for (Joueur i : joueurs) {
             if (i != attaquant) {
                 i.pointsJoueur += victoireDefense * nombrePointsTotal;

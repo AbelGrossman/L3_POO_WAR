@@ -14,7 +14,7 @@ public class Joueur {
     public List<Carte> pliJoueur;
     public String roleJoueur = "Defenseur";
     public Map<String, Integer> nombreCarteCouleurDansMain = new HashMap<>();
-    public int nombreAtoutsSups;
+    public int nombreAtoutsSups; 
     public int nombreAtoutsInfs;
     Map<Integer, Boolean> treflesDansMain = new HashMap<>();
     Map<Integer, Boolean> carreauxDansMain = new HashMap<>();
@@ -23,11 +23,13 @@ public class Joueur {
     Random rand = new Random();
     Boolean excusePassee;
 
+    //Constructeur de la classe Joueur
     public Joueur(String nom, List<Carte> main, int points, int niveau) {
         nomJoueur = nom;
         mainJoueur = main;
         pointsJoueur = points;
         niveauJoueur = niveau;
+        //Ajoute les cartes par couleur dans la main du joueur dans chacunes des hashmap
         for (int i = 1; i < 15; i++) {
             treflesDansMain.put(i, false);
             carreauxDansMain.put(i, false);
@@ -42,6 +44,7 @@ public class Joueur {
         nombreAtoutsInfs = 0;
         excusePassee = excusePasseePli;
         calculateurDeType(carteGagnante);
+        //Sélectionne la stratégie en fonction du niveau du joueur
         switch (niveauJoueur) {
             case 1:
                 return jouerCarteAuHasard(couleurDemandee, carteGagnante);
@@ -56,8 +59,10 @@ public class Joueur {
     private Carte jouerCarteAuHasard(String couleurDemandee, Carte carteGagnante) {
         Carte carteJouee = null;
 
+        //Continue à choisir une carte au hasard jusqu'à ce qu'une carte valide soit sélectionnée
         for (;;) {
             carteJouee = mainJoueur.get(rand.nextInt(mainJoueur.size()));
+            //Vérifie la validité de la carte en fonction du contexte du pli
             if (!excusePassee) {
                 if (isValidCard(carteJouee, couleurDemandee, carteGagnante)) {
                     System.out.println("Le " + nomJoueur + " joue: " + carteJouee.nomCarte);
@@ -70,10 +75,11 @@ public class Joueur {
                 }
             }
         }
+        //Verifie si l'excuse est passée
         if (carteJouee.getNom().equals("Excuse")) {
             excusePassee = true;
         }
-
+        //Retire la carte jouée de la main du joueur
         mainJoueur.remove(carteJouee);
         return carteJouee;
     }
@@ -95,35 +101,39 @@ public class Joueur {
         return carteJouee;
     }
 
+    //Méthode vérifiant la validité d'une carte
     private boolean isValidCard(Carte carteJouee, String couleurDemandee, Carte carteGagnante) {
+        //verifie si une couleur est demandée
         if (couleurDemandee != null) {
             if (carteJouee.typeCarte.equals("Excuse")) {
                 System.out.println("case 1");
                 return true;
             }
+            //Si la carte est de la couleur demandée et n'est pas un atout alors elle est valide
             if (carteJouee.typeCarte.equals(couleurDemandee) && !carteJouee.typeCarte.equals("Atout")) {
                 System.out.println("case 2");
                 return true;
             }
-
+            //Si la carte est un atout mais pas de la couleur demandée et si le joueur n'a pas de cartes de la couleur demandée alors elle est valide
             if (carteJouee.typeCarte.equals("Atout") && !carteJouee.typeCarte.equals(couleurDemandee)
                     && nombreCarteCouleurDansMain.get(couleurDemandee) == 0) {
                 System.out.println("case 3");
                 return true;
             }
-
+             // Si la carte est de la couleur demandée et un atout et a une valeur supérieure à la carte gagnante alors elle est valide
             if (carteJouee.typeCarte.equals(couleurDemandee) && carteJouee.typeCarte.equals("Atout")
                     && (carteJouee.valeurCarte > carteGagnante.valeurCarte
                             || nombreAtoutsSups == 0)) {
                 System.out.println("case 4");
                 return true;
             }
-
+            //Si la carte n'est pas de la couleur demandé et que la couleur demandée est un atout et que le joueur n'a pas de cartes de la couleur demandée alors elle est valide
             if (!carteJouee.typeCarte.equals(couleurDemandee) && couleurDemandee.equals("Atout")
                     && nombreCarteCouleurDansMain.get(couleurDemandee) == 0) {
                 System.out.println("case 5");
                 return true;
             }
+            // Si la couleur demandée n'est pas un atout, que la carte n'est pas de la couleur demandée et que le joueur n'a pas de cartes ni d'atouts ni de la couleur demandée alors elle est valide
             if (!couleurDemandee.equals("Atout") && (!carteJouee.typeCarte.equals(couleurDemandee)
                     && nombreCarteCouleurDansMain.get("Atout") == 0
                     && nombreCarteCouleurDansMain.get(couleurDemandee) == 0)) {
@@ -131,11 +141,8 @@ public class Joueur {
                 return true;
 
             }
-        } else
-
-        {
-            // Handle the case where couleurDemandee is null
-            return true; // Assuming any card is valid in this case
+        } else{
+            return true; 
         }
 
         return false;
