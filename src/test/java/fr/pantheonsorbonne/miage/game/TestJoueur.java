@@ -13,6 +13,8 @@ class TestJoueur {
     Joueur joueur1Test;
     Joueur joueur2Test;
 
+    //Vérification du bon respect des conditions selon lesquelles des cartes sont jouees,
+    //Aléatoirements ou stratégiquement
     @Test
     void createSampleHand() {
         for (Carte c : deckTest.deckComplet) {

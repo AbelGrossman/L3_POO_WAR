@@ -2,7 +2,6 @@ package fr.pantheonsorbonne.miage.game;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 //Classe Deck
 public class Deck {

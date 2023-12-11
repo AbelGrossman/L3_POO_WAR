@@ -4,12 +4,14 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
 class TestPartie {
     Deck deckTest = new Deck();
     Partie partieTest1 = new Partie(3, deckTest, 3);
     Partie partieTest2 = new Partie(4, deckTest, 4);
     Joueur joueurGagnantTest;
 
+    //Tests verifiant si le vainqueur est bien le joueur ayant obtenu le plus de points
     @Test
     void checkVainqueur() {
         if (partieTest1.joueur1Partie.pointsJoueur > partieTest1.joueur2Partie.pointsJoueur

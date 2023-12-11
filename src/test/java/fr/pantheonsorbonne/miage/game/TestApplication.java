@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+//Test de l'exactitude du nombre de joueurs pour une partie à 4 et 3 joueurs
 class TestApplication {
     Deck deckTest = new Deck();
     Partie partieTest = new Partie(4, deckTest, 3);

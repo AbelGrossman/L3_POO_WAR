@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TestCarte {
     Deck deckTest = new Deck();
 
+    //Vérification du nombre de points que les cartes spécialent au Tarot valent
     @Test
     void checkValue() {
         for (Carte c : deckTest.deckComplet) {

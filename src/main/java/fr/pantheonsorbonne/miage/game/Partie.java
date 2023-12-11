@@ -8,13 +8,16 @@ import java.util.HashMap;
 import java.util.Random;
 
 public class Partie {
-    //On déclare des joueurs pour la partie
+
+    // On déclare des joueurs pour la partie
     public Joueur joueur1Partie;
     public Joueur joueur2Partie;
     public Joueur joueur3Partie;
     public Joueur joueur4Partie;
 
-    //On déclare des joueurs pour les manches
+    // On déclare des joueurs pour les manches
+    // Cette distinction est importante pour l'ordre de distribution qui varie
+    // pendant la partie
     public Joueur joueur1Manche;
     public Joueur joueur2Manche;
     public Joueur joueur3Manche;
@@ -22,22 +25,32 @@ public class Partie {
 
     public List<Carte> deckMelangePartie;
 
-    //Pas compris à quoi servent les 4 mains
+    // Creation d'une main pour chaque joueur
     List<Carte> main1Partie = new ArrayList<>();
     List<Carte> main2Partie = new ArrayList<>();
     List<Carte> main3Partie = new ArrayList<>();
     List<Carte> main4Partie = new ArrayList<>();
+
+    // HashMap pour récupérer les valeurs des mises d'une manche au sein d'une
+    // partie
     Map<Joueur, Integer> misesPartie = new HashMap<>();
+
     public List<Joueur> joueurs = new ArrayList<>();
-    Random rand = new Random();
+
+    // Atribut distinguant les différents chiens possibles (3-6-9 à trois joueurs,
+    // 2-6-10 à 4)
     public int typeChien;
+
     public Joueur joueurGagnant;
 
-    //Constructeur d'une partie avec comme argument le nombre de joueurs, le jeu au complet et le nombre de manches
+    Random rand = new Random();
+
+    // Constructeur d'une partie avec comme argument le nombre de joueurs, le jeu au
+    // complet et le nombre de manches
     public Partie(int nombreJoueurs, Deck deckTarot, int nombreDeManches) {
-        //Mélange du deck car il est pour l'instant triée dans l'ordre
+        // Mélange du deck car il est pour l'instant triée dans l'ordre
         melangeDuDeck(deckTarot);
-        //Création des joueurs
+        // Instanciation des joueurs
         joueur1Partie = new Joueur("Joueur 1", main1Partie, 0, 1);
         joueur2Partie = new Joueur("Joueur 2", main2Partie, 0, 1);
         joueur3Partie = new Joueur("Joueur 3", main3Partie, 0, 1);
@@ -45,42 +58,57 @@ public class Partie {
         joueurs.add(joueur2Partie);
         joueurs.add(joueur3Partie);
         joueur4Partie = null;
-        Joueur swap = null;
+        // Instanciation du 4ème joueur si la partie se joue à 4
         if (nombreJoueurs == 4) {
             joueur4Partie = new Joueur("Joueur 4", main4Partie, 0, 1);
             joueurs.add(joueur4Partie);
         }
-        //On initialise des joueurs pour la 1ere manche 
-        //Si tu peux expliquer juste pourquoi faut créer un joueur diff à chaque manche c'est carré
+        // Variable permettant la permutation des joueurs (expliqué plus bas)
+        Joueur swap = null;
+        // Nous voulons une méthode permettant de faire une translation dans l'ordre des
+        // joueurs, car
+        // au tarot, un joueur joue en premier à la première manche, puis son voison de
+        // droite et ainsi
+        // de suite.
+        // Le but est ici de créé des Joueurs permanent tout le long de la partie, les
+        // "joueursPartie"
+        // et des joueurs temporaires, les "joueursManche". Lorsqu'on créera une manche,
+        // on entrera en
+        // paramètre les joueursManche, dont toujours dans le meme ordre (joueur1,
+        // joueur2, joueur3).
+        // Ainsi, on assigne à ces joueursManches des joueursPartie Différent avant
+        // chaque nouvelle manche
+        // pour faire une permutation de l'ordre.
+        // Pour la première manche on respecte l'ordre
         joueur1Manche = joueur1Partie;
         joueur2Manche = joueur2Partie;
         joueur3Manche = joueur3Partie;
         joueur4Manche = joueur4Partie;
-        //boucle pour le nombre de manches
+        // boucle pour le nombre de manches
         for (int i = 0; i < nombreDeManches; i++) {
+            // selection du chien
             selectionChien(nombreJoueurs);
-            System.out.println();
-            System.out.println();
-            //Affichage numéro de manches
+
             int numeroManche = i + 1;
             System.out.println("Debut de la manche " + numeroManche);
-            System.out.println();
-            System.out.println();
 
-            //On initialise les mises des joueurs à 0
+            // On initialise les mises des joueurs à 0 pour pouvoire entrer dans la boucle,
+            // et controler le derouler des manches depuis la classe Partie
             misesPartie.put(joueur1Partie, 0);
             misesPartie.put(joueur2Partie, 0);
             misesPartie.put(joueur3Partie, 0);
             misesPartie.put(joueur4Partie, 0);
 
-            //Boucle jusqu'à ce que tous les joueurs aient misé (0 = pas de mise)
+            //Boucle jusqu'à ce que tous les joueurs aient misé (0 = passé, càd pas de mise)
             while (misesPartie.get(joueur1Manche) == 0 && misesPartie.get(joueur2Manche) == 0
                     && misesPartie.get(joueur3Manche) == 0 && misesPartie.get(joueur4Manche) == 0) {
-                        //Création d'une manche suite à la mise
+                // Création d'une manche prenant en parametres les joueurs (toujours 4), le deck melangé,
+                //et le type de chien
                 Manche manche = new Manche(joueur1Manche, joueur2Manche, joueur3Manche, joueur4Manche,
                         deckMelangePartie,
                         typeChien);
-                //Attribution des mises en fonction du choix de chaque joueur
+                // Attribution d'une valeur de mise en fonction des mises de chaque joueur, 
+                // pour potentiellement sortir de la boucle.
                 for (Joueur j : joueurs) {
                     switch (j.miseJoueur) {
                         case "Garde Contre":
@@ -100,14 +128,16 @@ public class Partie {
                             break;
                     }
                 }
-                //On nettoye les mains des joueurs pour la prochaine manche
+
+                // On nettoye les mains des joueurs pour la prochaine manche, et le packet du chien
+                // Les deux sont remplis dans la classe manche.
                 joueur1Manche.mainJoueur.clear();
                 joueur2Manche.mainJoueur.clear();
                 joueur3Manche.mainJoueur.clear();
                 manche.packetChien.clear();
 
                 // Rotation des joueurs pour la prochaine manche
-                //le distributeur se décale
+                // Le donneur est décalé d'un rang à droite et ainsi de suite
                 swap = joueur1Manche;
                 joueur1Manche = joueur2Manche;
                 joueur2Manche = joueur3Manche;
@@ -118,7 +148,7 @@ public class Partie {
                     joueur4Manche = swap;
                 }
             }
-            List<Integer> scoreFinaux=new ArrayList();
+            
             System.out.println("Points du Joueur 1: " + joueur1Partie.pointsJoueur);
             System.out.println("Points du Joueur 2: " + joueur2Partie.pointsJoueur);
             System.out.println("Points du Joueur 3: " + joueur3Partie.pointsJoueur);
@@ -126,7 +156,7 @@ public class Partie {
                 System.out.println("Points du Joueur 4: " + joueur4Partie.pointsJoueur);
             }
         }
-        //On détermine le joueur gagnant de la partie en fonction des points
+        // On détermine le joueur gagnant de la partie en fonction des points
         if (nombreJoueurs == 3) {
             if (joueur1Partie.pointsJoueur > joueur2Partie.pointsJoueur
                     && joueur1Partie.pointsJoueur > joueur3Partie.pointsJoueur) {
@@ -157,16 +187,20 @@ public class Partie {
                 joueurGagnant = joueur4Partie;
             }
         }
-        System.out.println("Le "+joueurGagnant+" remporte la partie!");
+        System.out.println("Le " + joueurGagnant.nomJoueur + " remporte la partie!");
     }
 
-    //on mélange le deck
     public void melangeDuDeck(Deck deckTarot) {
         Collections.shuffle(deckTarot.deckComplet);
+        // On récupère le deck mélangé dans une variable
         deckMelangePartie = deckTarot.deckComplet;
     }
 
-    //On sélectionne le type de chien en fonction du nombre de joueurs et surtout au hasard (règle spéciale)
+    // On sélectionne le type de chien aléatoirement et en fonction du nombre de
+    // joueurs
+    // pour respecter les règles bonus. Le chien peut être de 2-6-10 pour 4 joueurs
+    // et de 3-6-9
+    // pour 3 joueurs.
     public void selectionChien(int nombreJoueurs) {
         if (nombreJoueurs == 3) {
             int randomValue = rand.nextInt(3);

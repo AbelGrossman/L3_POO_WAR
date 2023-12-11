@@ -40,6 +40,8 @@ class TestDeck {
         assertEquals(78, deckTest.deckComplet.size());
     }
 
+    //Vérfication du nombre d'elements (Atout compris) de chaque couleur dans le deck, 
+    //et du nombre d'élements de chaque valeur dans le deck (1,4,Roi,Dame,21...)
     @Test
     void checkQuantiteCouleursEtValeurs() {
         for (Carte c : deckTest.deckComplet) {
