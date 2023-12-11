@@ -53,7 +53,8 @@ public class Partie {
         // Instanciation des joueurs
         joueur1Partie = new Joueur("Joueur 1", main1Partie, 0, 1);
         joueur2Partie = new Joueur("Joueur 2", main2Partie, 0, 1);
-        joueur3Partie = new Joueur("Joueur 3", main3Partie, 0, 1);
+        //On donne le niveau 2 au joueur 3
+        joueur3Partie = new Joueur("Joueur 3", main3Partie, 0, 2);
         joueurs.add(joueur1Partie);
         joueurs.add(joueur2Partie);
         joueurs.add(joueur3Partie);

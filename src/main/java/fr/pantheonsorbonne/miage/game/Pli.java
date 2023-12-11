@@ -45,7 +45,7 @@ public class Pli {
         for (Joueur joueur : joueurs) {
             //On appelle la méthode joueurCarte de la classe joueur, pour le joueur en cours, et
             //on récupère la carte jouée.
-            Carte carteJouee = joueur.jouerCarte(couleurDemandee, carteGagnante, excusePassee);
+            Carte carteJouee = joueur.jouerCarte(couleurDemandee, carteGagnante, excusePassee, joueurGagnant);
             //On récupère l'info de si oui ou non l'excuse a été jouée, pour que ce soit pris en compte
             //pour le prochain joueur et les prochains plis.
             excusePassee = joueur.excusePassee;

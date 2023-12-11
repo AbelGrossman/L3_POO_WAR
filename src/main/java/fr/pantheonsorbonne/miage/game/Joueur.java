@@ -31,6 +31,14 @@ public class Joueur {
     // Bolleen vérifiant si oui ou non l'excuse a été jouée, pour modifier les
     // règles en fonction (règles bonus)
     Boolean excusePassee;
+    Carte carteTreflesInfs = null;
+    Carte cartePiquesInfs = null;
+    Carte carteCarreauxInfs = null;
+    Carte carteCoeursInfs = null;
+    Carte plusPetitAtoutSup = null;
+    Carte plusGrandAtoutInf = null;
+    Carte plusPetitAtout = null;
+    Carte plusGrandAtout = null;
     Random rand = new Random();
 
     public Joueur(String nom, List<Carte> main, int points, int niveau) {
@@ -49,17 +57,38 @@ public class Joueur {
     }
 
     // Le joueur joue une carte
-    public Carte jouerCarte(String couleurDemandee, Carte carteGagnante, Boolean excusePasseePli) {
+    public Carte jouerCarte(String couleurDemandee, Carte carteGagnante, Boolean excusePasseePli,
+            Joueur joueurGagnant) {
         nombreAtoutsSups = 0;
         nombreAtoutsInfs = 0;
         excusePassee = excusePasseePli;
+        carteTreflesInfs = null;
+        cartePiquesInfs = null;
+        carteCarreauxInfs = null;
+        carteCoeursInfs = null;
+        plusPetitAtoutSup = null;
+        plusGrandAtoutInf = null;
+        plusPetitAtout = null;
+        plusGrandAtout = null;
+        System.out.println("on repasse");
         calculateurDeType(carteGagnante);
         // Sélectionne la stratégie en fonction du niveau du joueur
         switch (niveauJoueur) {
             case 1:
                 return jouerCarteAuHasard(couleurDemandee, carteGagnante);
             case 2:
-                return jouerStrategieAvancee(couleurDemandee, carteGagnante);
+                for (Carte c : mainJoueur) {
+                    System.out.println(c.nomCarte);
+                }
+                System.out.println("plus petit atout sup: " + plusPetitAtoutSup.nomCarte);
+                System.out.println("plus grand atout inf: " + plusGrandAtoutInf.nomCarte);
+                System.out.println("plus petit atout: " + plusPetitAtout.nomCarte);
+                System.out.println("plus grand atout: " + plusGrandAtout.nomCarte);
+                System.out.println("coeurs inf: " + carteCoeursInfs.nomCarte);
+                System.out.println("trefle inf: " + carteTreflesInfs.nomCarte);
+                System.out.println("piques inf: " + cartePiquesInfs.nomCarte);
+                System.out.println("carreaux inf: " + carteCarreauxInfs.nomCarte);
+                return jouerCarteAuHasardStratAvancee(couleurDemandee, carteGagnante, joueurGagnant);
             default:
                 return jouerCarteAuHasard(couleurDemandee, carteGagnante);
         }
@@ -97,16 +126,35 @@ public class Joueur {
     }
 
     // Stratégie avancée pour le bot "smart"
-    private Carte jouerStrategieAvancee(String couleurDemandee, Carte carteGagnante) {
+    private Carte jouerCarteAuHasardStratAvancee(String couleurDemandee, Carte carteGagnante, Joueur joueurGagnant) {
+        Carte carteJouee = null;
         // Implémenter une stratégie avancée ici
         // Par exemple, utiliser un algorithme Minimax pour anticiper les coups
         // Pour l'exemple, on retourne simplement la carte la plus basse
-        Carte carteJouee = null;
-        for (Carte c : mainJoueur) {
-            carteJouee = c;
-            if (c.getNom().equals("9 de Coeur")) {
-                break;
+        for (;;) {
+            carteJouee = mainJoueur.get(rand.nextInt(mainJoueur.size()));
+            System.out.println("couleur demandée: " + couleurDemandee);
+            if (carteGagnante != null) {
+                System.out.println("carte gagnate: " + carteGagnante.nomCarte);
             }
+            System.out.println("carte jouee: " + carteJouee.nomCarte);
+            // Vérifie la validité de la carte en fonction du contexte du pli
+            if (!excusePassee) {
+                System.out.println("first");
+                if (isValidCardStrat1(carteJouee, couleurDemandee, carteGagnante, joueurGagnant)) {
+
+                    break;
+                }
+            } else {
+                System.out.println("second");
+                if (isValidCardStrat2(carteJouee, couleurDemandee, carteGagnante, joueurGagnant)) {
+
+                    break;
+                }
+            }
+        }
+        if (carteJouee.getNom().equals("Excuse")) {
+            excusePassee = true;
         }
         mainJoueur.remove(carteJouee);
         return carteJouee;
@@ -128,13 +176,19 @@ public class Joueur {
                 return true;
             }
             // Si la carte est un atout mais pas de la couleur demandée et si le joueur n'a
-            // pas de cartes de la couleur demandée alors elle est valide
+            // pas de cartes de la couleur demandée alors elle est valide si aucun autre
+            // atout n'a été joué
+            // ou si l'atout est de valeur supèrieure à l'atout gagnant
             if (carteJouee.typeCarte.equals("Atout") && !carteJouee.typeCarte.equals(couleurDemandee)
-                    && nombreCarteCouleurDansMain.get(couleurDemandee) == 0) {
+                    && nombreCarteCouleurDansMain.get(couleurDemandee) == 0 && (!carteGagnante.typeCarte.equals("Atout")
+                            || carteGagnante.valeurCarte < carteJouee.valeurCarte
+                            || (carteGagnante.typeCarte.equals("Atout") && nombreAtoutsSups == 0))) {
                 return true;
             }
             // Si la carte est de la couleur demandée, est un atout et a une valeur
-            // supérieure à la carte gagnante alors elle est valide
+            // supérieure à la carte gagnante, ou que le joueur n'a pas de cartes de valeur
+            // supérieure
+            // alors elle est valide
             if (carteJouee.typeCarte.equals(couleurDemandee) && carteJouee.typeCarte.equals("Atout")
                     && (carteJouee.valeurCarte > carteGagnante.valeurCarte
                             || nombreAtoutsSups == 0)) {
@@ -175,7 +229,9 @@ public class Joueur {
                 return true;
             }
             if (carteJouee.typeCarte.equals("Atout") && !carteJouee.typeCarte.equals(couleurDemandee)
-                    && nombreCarteCouleurDansMain.get(couleurDemandee) == 0) {
+                    && nombreCarteCouleurDansMain.get(couleurDemandee) == 0 && (!carteGagnante.typeCarte.equals("Atout")
+                            || carteGagnante.valeurCarte > carteJouee.valeurCarte
+                            || (carteGagnante.typeCarte.equals("Atout") && nombreAtoutsInfs == 0))) {
                 return true;
             }
 
@@ -207,6 +263,241 @@ public class Joueur {
         return false;
     }
 
+    private Boolean isValidCardStrat1(Carte carteJouee, String couleurDemandee, Carte carteGagnante,
+            Joueur joueurGagnant) {
+        if (couleurDemandee != null) {
+            // La stratégie avancée consiste a prendre en compte plus de conditions
+            // pour les défenseurs quand le joueur qui gagne est l'attaquant.
+            // Elle n'est donc que prise en compte si le joueur intéligent différe du joueur
+            // attaquant lors d'une manche
+            if (joueurGagnant.roleJoueur.equals("Attaquant")) {
+                if (carteJouee.typeCarte.equals("Excuse")) {
+                    System.out.println("case 2.1");
+                    return true;
+                }
+                // Si la carte est de la couleur demandée et n'est pas un atout alors, on
+                // s'assure avec
+                // la stratégie avancée de jouer la plus petite carte possible quand on sait que
+                // le gagnant
+                // est l'attaquant, à moins que notre carte soit plus grande que la sienne
+                if (carteJouee.typeCarte.equals(couleurDemandee) && !carteJouee.typeCarte.equals("Atout")) {
+                    if (!carteGagnante.typeCarte.equals("Atout")
+                            && carteGagnante.valeurCarte < carteJouee.valeurCarte) {
+                        System.out.println("case 2.2.1");
+                        return true;
+                    }
+                    if (couleurDemandee.equals("Trefle") && carteTreflesInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 2.2.2");
+                        return true;
+                    }
+                    if (couleurDemandee.equals("Pique") && cartePiquesInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 2.2.3");
+                        return true;
+                    }
+                    if (couleurDemandee.equals("Coeur") && carteCoeursInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 2.2.4");
+                        return true;
+                    }
+                    if (couleurDemandee.equals("Carreau") && carteCarreauxInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 2.2.5");
+                        return true;
+                    }
+                }
+                // Maintenant, on veut que le joueur ne se débarasse que de son atout le plus
+                // petit possible
+                System.out.println("carte jouee valeur: " + carteJouee.valeurCarte);
+                System.out.println("carte plus petit sup valeur: " + plusPetitAtoutSup.valeurCarte);
+                if (carteJouee.typeCarte.equals("Atout") && !carteJouee.typeCarte.equals(couleurDemandee)
+                        && nombreCarteCouleurDansMain.get(couleurDemandee) == 0
+                        && ((!carteGagnante.typeCarte.equals("Atout")
+                                && carteJouee.valeurCarte == plusPetitAtout.valeurCarte)
+                                || (carteGagnante.typeCarte.equals("Atout")
+                                        && ((carteJouee.valeurCarte == plusPetitAtoutSup.valeurCarte)
+                                                || (nombreAtoutsSups == 0
+                                                        && carteJouee.valeurCarte == plusPetitAtout.valeurCarte))))) {
+                    System.out.println("case 2.3");
+                    return true;
+                }
+                // Maintenant, on veut que le joueur ne se débarasse que de son atout le plus
+                // petit possible
+                if (carteJouee.typeCarte.equals(couleurDemandee) && carteJouee.typeCarte.equals("Atout")
+                        && (carteJouee.valeurCarte == plusPetitAtoutSup.valeurCarte
+                                || (nombreAtoutsSups == 0
+                                        && carteJouee.valeurCarte == plusPetitAtout.valeurCarte))) {
+                    System.out.println("case 2.4");
+                    return true;
+                }
+                // Maintenant, on veut que le joueur se débarasse de la plus petite carte
+                // possible
+                if (!carteJouee.typeCarte.equals(couleurDemandee) && couleurDemandee.equals("Atout")
+                        && nombreCarteCouleurDansMain.get(couleurDemandee) == 0) {
+                    if (carteJouee.typeCarte.equals("Trefle")
+                            && carteTreflesInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 2.5.1");
+                        return true;
+                    }
+                    if (carteJouee.typeCarte.equals("Pique") && cartePiquesInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 2.5.2");
+                        return true;
+                    }
+                    if (carteJouee.typeCarte.equals("Coeur") && carteCoeursInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 2.5.3");
+                        return true;
+                    }
+                    if (carteJouee.typeCarte.equals("Carreau")
+                            && carteCarreauxInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 2.5.4");
+                        return true;
+                    }
+                }
+                // Même chose ici
+                if (!couleurDemandee.equals("Atout") && (!carteJouee.typeCarte.equals(couleurDemandee)
+                        && nombreCarteCouleurDansMain.get("Atout") == 0
+                        && nombreCarteCouleurDansMain.get(couleurDemandee) == 0)) {
+                    if (carteJouee.typeCarte.equals("Trefle")
+                            && carteTreflesInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 2.6.1");
+                        return true;
+                    }
+                    if (carteJouee.typeCarte.equals("Pique") && cartePiquesInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 2.6.2");
+                        return true;
+                    }
+                    if (carteJouee.typeCarte.equals("Coeur") && carteCoeursInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 2.6.3");
+                        return true;
+                    }
+                    if (carteJouee.typeCarte.equals("Carreau")
+                            && carteCarreauxInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 2.6.4");
+                        return true;
+                    }
+                }
+
+            } else {
+                System.out.println("case classique 2");
+                return isValidCard(carteJouee, couleurDemandee, carteGagnante);
+            }
+        } // Si la coleur demandée est null (cad si c'est au tout du premier joueur)
+        else {
+            return true;
+        }
+        return false;
+    }
+
+    private Boolean isValidCardStrat2(Carte carteJouee, String couleurDemandee, Carte carteGagnante,
+            Joueur joueurGagnant) {
+        if (couleurDemandee != null) {
+            System.out.println("Went in");
+            if (joueurGagnant.roleJoueur.equals("Attaquant")) {
+                if (carteGagnante.typeCarte.equals("Excuse")) {
+                    System.out.println("case 1.1");
+                    return true;
+                }
+                if (carteJouee.typeCarte.equals(couleurDemandee) && !carteJouee.typeCarte.equals("Atout")) {
+                    if (!carteGagnante.typeCarte.equals("Atout")
+                            && carteGagnante.valeurCarte < carteJouee.valeurCarte) {
+                        System.out.println("case 1.2.1");
+                        return true;
+                    }
+                    if (couleurDemandee.equals("Trefle") && carteTreflesInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 1.2.2");
+                        return true;
+                    }
+                    if (couleurDemandee.equals("Pique") && cartePiquesInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 1.2.3");
+                        return true;
+                    }
+                    if (couleurDemandee.equals("Coeur") && carteCoeursInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 1.2.4");
+                        return true;
+                    }
+                    if (couleurDemandee.equals("Carreau") && carteCarreauxInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 1.2.5");
+                        return true;
+                    }
+                }
+                // Maintenant, on veut que le joueur ne se débarasse que de son atout le plus
+                // grand possible (regles bonus)
+                if (carteJouee.typeCarte.equals("Atout") && !carteJouee.typeCarte.equals(couleurDemandee)
+                        && nombreCarteCouleurDansMain.get(couleurDemandee) == 0
+                        && ((!carteGagnante.typeCarte.equals("Atout")
+                                && carteJouee.valeurCarte == plusGrandAtout.valeurCarte)
+                                || (carteGagnante.typeCarte.equals("Atout")
+                                        && ((carteJouee.valeurCarte == plusGrandAtoutInf.valeurCarte)
+                                                || (nombreAtoutsInfs == 0
+                                                        && carteJouee.valeurCarte == plusGrandAtout.valeurCarte))))) {
+                    System.out.println("case 1.3");
+                    return true;
+                }
+                // Maintenant, on veut que le joeur ne se débarasse que de son atout le plus
+                // grand possible
+                if (carteJouee.typeCarte.equals(couleurDemandee) && carteJouee.typeCarte.equals("Atout")
+                        && (carteJouee.valeurCarte == plusGrandAtoutInf.valeurCarte
+                                || (nombreAtoutsInfs == 0
+                                        && carteJouee.valeurCarte == plusGrandAtout.valeurCarte))) {
+                    System.out.println("case 1.4");
+                    return true;
+                }
+                // Maintenant, on veut que le joueur se débarasse de la plus petite carte
+                // possible
+                if (!carteJouee.typeCarte.equals(couleurDemandee) && couleurDemandee.equals("Atout")
+                        && nombreCarteCouleurDansMain.get(couleurDemandee) == 0) {
+                    if (carteJouee.typeCarte.equals("Trefle")
+                            && carteTreflesInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 1.5.1");
+                        return true;
+                    }
+                    if (carteJouee.typeCarte.equals("Pique") && cartePiquesInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 1.5.2");
+                        return true;
+                    }
+                    if (carteJouee.typeCarte.equals("Coeur") && carteCoeursInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 1.5.3");
+                        return true;
+                    }
+                    if (carteJouee.typeCarte.equals("Carreau")
+                            && carteCarreauxInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 1.5.4");
+                        return true;
+                    }
+                }
+                // Même chose ici
+                if (!couleurDemandee.equals("Atout") && (!carteJouee.typeCarte.equals(couleurDemandee)
+                        && nombreCarteCouleurDansMain.get("Atout") == 0
+                        && nombreCarteCouleurDansMain.get(couleurDemandee) == 0)) {
+                    if (carteJouee.typeCarte.equals("Trefle")
+                            && carteTreflesInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 1.6.1");
+                        return true;
+                    }
+                    if (carteJouee.typeCarte.equals("Pique") && cartePiquesInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 1.6.2");
+                        return true;
+                    }
+                    if (carteJouee.typeCarte.equals("Coeur") && carteCoeursInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 1.6.3");
+                        return true;
+                    }
+                    if (carteJouee.typeCarte.equals("Carreau")
+                            && carteCarreauxInfs.valeurCarte == carteJouee.valeurCarte) {
+                        System.out.println("case 1.6.4");
+                        return true;
+                    }
+                }
+
+            } else {
+                System.out.println("case classique 1");
+                return isValidCard2(carteJouee, couleurDemandee, carteGagnante);
+            }
+        } // Si la coleur demandée est null (cad si c'est au tout du premier joueur)
+        else {
+            return true;
+        }
+
+        return false;
+    }
+
     // Le calculateur de type calcul à la fois le nombre de cartes de chaque
     // couleurs ainsi que le nombre
     // d'atouts supérieurs ou inférieurs à l'atout gagnant (ce qui change en
@@ -218,17 +509,61 @@ public class Joueur {
         nombreCarteCouleurDansMain.put("Carreau", 0);
         nombreCarteCouleurDansMain.put("Atout", 0);
 
+        plusPetitAtoutSup = new Carte("Atout", 21, "21 d'atout", true, 5);
+        plusGrandAtoutInf = new Carte("Atout", 1, "1 d'atout", true, 5);
+        plusGrandAtout = new Carte("Atout", 1, "1 d'atout", true, 5);
+        plusPetitAtout = new Carte("Atout", 21, "21 d'atout", true, 5);
+        carteTreflesInfs = new Carte("Trefle", 14, "Roi de Trefle", false, 5);
+        cartePiquesInfs = new Carte("Pique", 14, "Roi de Pique", false, 5);
+        carteCoeursInfs = new Carte("Coeur", 14, "Roi de Coeur", false, 5);
+        carteCarreauxInfs = new Carte("Carreau", 14, "Roi de Carreau", false, 5);
         for (Carte i : mainJoueur) {
             // Sauf si la carte est l'Excuse
             if (!i.typeCarte.equals("Excuse")) {
                 nombreCarteCouleurDansMain.put(i.typeCarte, nombreCarteCouleurDansMain.get(i.typeCarte) + 1);
-                if (carteGagnante != null && i.typeCarte.equals("Atout") && carteGagnante.typeCarte.equals("Atout")
-                        && (i.valeurCarte > carteGagnante.valeurCarte)) {
-                    nombreAtoutsSups++;
-                } else if (carteGagnante != null && i.typeCarte.equals("Atout")
-                        && carteGagnante.typeCarte.equals("Atout")
-                        && (i.valeurCarte < carteGagnante.valeurCarte)) {
-                    nombreAtoutsInfs++;
+                if (carteGagnante != null) {
+                    if (i.typeCarte.equals("Atout")) {
+                        if (i.valeurCarte > plusGrandAtout.valeurCarte) {
+                            plusGrandAtout = i;
+                            System.out.println("plus grand atout dans:" + plusGrandAtout.nomCarte);
+                        }
+                        if (i.valeurCarte < plusPetitAtout.valeurCarte) {
+                            plusPetitAtout = i;
+                            System.out.println("plus petit atout dans:" + plusPetitAtout.nomCarte);
+                        }
+                    }
+                    if (i.typeCarte.equals("Atout") && carteGagnante.typeCarte.equals("Atout")
+                            && (i.valeurCarte > carteGagnante.valeurCarte)) {
+                        nombreAtoutsSups++;
+                        if (i.valeurCarte < plusPetitAtoutSup.valeurCarte) {
+                            plusPetitAtoutSup = i;
+                        }
+                    }
+                    if (i.typeCarte.equals("Atout")
+                            && carteGagnante.typeCarte.equals("Atout")
+                            && (i.valeurCarte < carteGagnante.valeurCarte)) {
+                        nombreAtoutsInfs++;
+                        if (i.valeurCarte > plusGrandAtoutInf.valeurCarte) {
+                            plusGrandAtoutInf = i;
+                        }
+                        if (i.valeurCarte < plusPetitAtout.valeurCarte) {
+                            plusGrandAtoutInf = i;
+                        }
+                    }
+                    if (i.typeCarte.equals("Trefle") && i.valeurCarte < carteTreflesInfs.valeurCarte) {
+                        carteTreflesInfs = i;
+                    }
+                    if (i.typeCarte.equals("Pique")
+                            && i.valeurCarte < cartePiquesInfs.valeurCarte) {
+                        cartePiquesInfs = i;
+                    }
+                    if (i.typeCarte.equals("Carreau") && i.valeurCarte < carteCarreauxInfs.valeurCarte) {
+                        carteCarreauxInfs = i;
+                    }
+                    if (i.typeCarte.equals("Coeur")
+                            && i.valeurCarte < carteCoeursInfs.valeurCarte) {
+                        carteCoeursInfs = i;
+                    }
                 }
             }
         }

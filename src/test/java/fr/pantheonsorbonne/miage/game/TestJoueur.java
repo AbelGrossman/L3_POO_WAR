@@ -13,14 +13,19 @@ class TestJoueur {
     Joueur joueur1Test;
     Joueur joueur2Test;
 
-    //Vérification du bon respect des conditions selon lesquelles des cartes sont jouees,
-    //Aléatoirements ou stratégiquement
+    // Vérification du bon respect des conditions selon lesquelles des cartes sont
+    // jouees,
+    // Aléatoirements ou stratégiquement
     @Test
     void createSampleHand() {
+        Carte plusPetitTrefle = new Carte("Atout", 1, "1 d'Atout", true, 5);
         for (Carte c : deckTest.deckComplet) {
             mainTest.add(c);
             if (mainTest.size() == 8) {
                 break;
+            }
+            if (c.nomCarte.equals("1 de Trefle")) {
+                plusPetitTrefle = c;
             }
         }
         Carte carteATester = new Carte("Coeur", 9, "9 de Coeur", false, 1);
@@ -28,10 +33,13 @@ class TestJoueur {
         Carte carteGagnanteTest = new Carte("Trefle", 10, "10 de Trefle", false, 1);
         joueur1Test = new Joueur("joueur1Test", mainTest, 0, 1);
         joueur2Test = new Joueur("joueur2Test", mainTest, 0, 2);
-        joueur1Test.jouerCarte("Trefle", carteGagnanteTest, false);
+        joueur2Test.roleJoueur = "Attaquant";
+        joueur1Test.jouerCarte("Trefle", carteGagnanteTest, false, joueur2Test);
         assertEquals(true, joueur1Test.mainJoueur.contains(carteATester));
-        joueur2Test.jouerCarte("Trefle", carteGagnanteTest, false);
-        assertEquals(false, joueur2Test.mainJoueur.contains(carteATester));
+        joueur2Test.roleJoueur = "Defenseur";
+        joueur1Test.roleJoueur = "Attaquant";
+        joueur2Test.jouerCarte("Trefle", carteGagnanteTest, false, joueur1Test);
+        assertEquals(false, joueur2Test.mainJoueur.contains(plusPetitTrefle));
     }
 
 }

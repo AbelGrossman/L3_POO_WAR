@@ -771,7 +771,8 @@ public class Manche {
                 // Vérifie si la carte est une tête et si elle peut être défaussée
                 if (mainAttaquant.get(i).valeurCarte > 10) {
                     // Switch pour gérer les différents cas des têtes
-                    // On conserve les têtes uniquement si on a une suite (Valet Cavalier Dame Roi, Dame Roi..)
+                    // On conserve les têtes uniquement si on a une suite (Valet Cavalier Dame Roi,
+                    // Dame Roi..)
                     switch (mainAttaquant.get(i).valeurCarte) {
                         case 11:
                             switch (couleurActuelle) {
@@ -908,16 +909,18 @@ public class Manche {
                         continue;
                     }
                     i++;
-                    if(i>mainAttaquant.size){if(!mainAttaquant.get(i).typeCarte.equals("Excuse")
-                            && mainAttaquant.get(i).valeurCarte!= 21 && mainAttaquant.get(i).valeurCarte!=1){
-                                pliAttaque.add(mainAttaquant.get(i));
-                        mainAttaquant.remove(i);
-                        if (packetChien.size() == pliAttaque.size()) {
-                            break;
+                    if (i > mainAttaquant.size()) {
+                        if (!mainAttaquant.get(i).typeCarte.equals("Excuse")
+                                && mainAttaquant.get(i).valeurCarte != 21 && mainAttaquant.get(i).valeurCarte != 1) {
+                            pliAttaque.add(mainAttaquant.get(i));
+                            mainAttaquant.remove(i);
+                            if (packetChien.size() == pliAttaque.size()) {
+                                break;
+                            }
+                            continue;
                         }
-                        continue;
                     }
-                }}
+                }
             }
             i++; // Passe à la carte suivante dans la main
         }
@@ -949,7 +952,7 @@ public class Manche {
         }
     }
 
-    //methode pour calculer les points de manche
+    // methode pour calculer les points de manche
     public void calculPointsDeManche(List<Carte> pliAttaque) {
         List<Carte> pliComptagePoints = new ArrayList<>();
         int taillePliAttaque = pliAttaque.size();
@@ -971,17 +974,21 @@ public class Manche {
                     pliComptagePoints.add(i);
                 }
             }
-            // On ajoute une carte avec 1 point au comptage suivie d'une carte spéciale valant plus d'un point
-            // C'est la manière naturelle de compter au Tarot, pour obtenir le maximum de points
-            //On ajoute une carte au pliComptage si la carte précedente dans le pliAttaque est de valeur différent
-            //(1 si spéciale, spéciale si 1)
+            // On ajoute une carte avec 1 point au comptage suivie d'une carte spéciale
+            // valant plus d'un point
+            // C'est la manière naturelle de compter au Tarot, pour obtenir le maximum de
+            // points
+            // On ajoute une carte au pliComptage si la carte précedente dans le pliAttaque
+            // est de valeur différent
+            // (1 si spéciale, spéciale si 1)
             for (int i = 0; i < pliAttaque.size(); i++) {
                 if (i > 0 && (pliAttaque.get(i - 1).getPoints() == 1 || pliAttaque.get(i).getPoints() == 1)
                         && pliAttaque.get(i - 1).getPoints() != pliAttaque.get(i).getPoints()) {
                     pliComptagePoints.add(pliAttaque.get(i));
                 }
             }
-            //On retire la carte ajoutée du pliAttaque pour permettre une nouvelle succession de cartes
+            // On retire la carte ajoutée du pliAttaque pour permettre une nouvelle
+            // succession de cartes
             for (Carte i : pliComptagePoints) {
                 for (Carte j : pliAttaque) {
                     if (i == j) {
@@ -1000,7 +1007,8 @@ public class Manche {
         int mise = 0;
         int victoireDefense = 1; // variable de victoire/défaite de la défense (-1 si l'attaque gagne)
         int nombrePointsPliAttaquant = 0;
-        //Multiplicateur de score en fonction de la mise
+        // Multiplicateur de score en fonction de la mise
+        System.out.print("Le " + attaquant.nomJoueur + " est attaquant. Il remporte la mise avec une ");
         switch (attaquant.miseJoueur) {
             case "Garde Contre":
                 System.out.println("Garde Contre");
@@ -1022,8 +1030,10 @@ public class Manche {
                 mise = 1;
                 break;
         }
+        System.out.println("Il doit faire un score de " + scoreARealiser);
         // Calcul du nombre total de points dans le pli de l'attaque
-        // On compte le cartes 2 par 2, en prenant en compte uniquement la meilleure carte.
+        // On compte le cartes 2 par 2, en prenant en compte uniquement la meilleure
+        // carte.
         // D'où la nécessité de la méthode précedente.
         for (int i = 0; i < pliComptagePoints.size(); i += 2) {
             int max = pliComptagePoints.get(i).getPoints();
@@ -1032,16 +1042,16 @@ public class Manche {
             }
             nombrePointsPliAttaquant += max;
         }
-
+        System.out.println("L'attaquant réalise un score de " + nombrePointsPliAttaquant);
         // Calcul de la différence de points par rapport au score à réaliser
         difference = Math.abs(nombrePointsPliAttaquant - scoreARealiser);
         System.out.println("Différence de score: " + difference);
 
         if (nombrePointsPliAttaquant >= scoreARealiser) {
             victoireDefense = -1;
-            System.out.println("L'attaquant, qui est le " + attaquant.nomJoueur + ", gagne!");
+            System.out.println("L'attaquant gagne!");
         } else {
-            System.out.println("L'attaquant, qui est le " + attaquant.nomJoueur + ", chute!");
+            System.out.println("L'attaquant chute!");
         }
         // Calcul du nombre total de points gagner suite à la fin de la manche
         nombrePointsTotal = ((25 + difference) * mise);
@@ -1049,6 +1059,7 @@ public class Manche {
         // Attribution des points aux joueurs en fonction du résultat
         for (Joueur i : joueurs) {
             if (i != attaquant) {
+                //Les point de la défense est négatif si l'attaquant gagne
                 i.pointsJoueur += victoireDefense * nombrePointsTotal;
                 if (bonusPetitAuBoutDefenseur) {
                     System.out.println("Bonus petit au bout defenseur");
@@ -1059,6 +1070,7 @@ public class Manche {
                 }
 
             } else {
+                //Le score de l'attaquant vaut le score de la défense fois -1 fois le nombre de défenseurs
                 attaquant.pointsJoueur += -1 * victoireDefense * nombrePointsTotal * (joueurs.size() - 1);
                 if (bonusPetitAuBoutAttaquant) {
                     System.out.println("Bonus petit au bout attaquant");
