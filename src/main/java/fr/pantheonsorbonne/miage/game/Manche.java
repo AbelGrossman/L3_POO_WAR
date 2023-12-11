@@ -87,10 +87,8 @@ public class Manche {
         // Distribution des cartes en fonction du nombre de joueurs
         if (joueur4 != null) {
             distributionQuatreJoueurs();
-            System.out.println("fin de distribution");
         } else {
             distributionTroisJoueurs();
-            System.out.println("fin de distribution");
         }
         misesJoueurs();
         // Vérifie si un joueur prend, si oui on lance la méthode suiteDeManche
@@ -110,7 +108,6 @@ public class Manche {
                 attaquant = i; // le joueur ayant la mise la plus haute devient l'attaquant
             }
         }
-        System.out.println("mise de l'attaquant: " + attaquant.miseJoueur);
 
         // Score à réaliser en fonction du nombre de bouts
         countBoutAttaquant = nombreCartesSpeciales(attaquant, attaquant.mainJoueur)[0];
@@ -145,7 +142,6 @@ public class Manche {
         List<Joueur> swapJoueurs = joueurs;
         // Boucle jusqu'à ce que tous les joueurs aient joué toutes leurs cartes
         while (!joueur1.mainJoueur.isEmpty()) {
-            System.out.println(joueur1.mainJoueur.size());
 
             // Création d'un pli
             Pli pli = new Pli(joueurs, excusePassee);
@@ -320,10 +316,8 @@ public class Manche {
                         // Si on a les 3 bouts, 1 roi ou plus et 6 atouts ou plus on fait une Garde
                         // Contre,
                         // ainsi de suite...
-                        System.out.println("case 5!");
                         return GC;
                     } else if (conteurDeMises.get(GS) != 1) {
-                        System.out.println("case 6!");
                         return GS;
                     }
                 }
@@ -331,10 +325,8 @@ public class Manche {
                 // faite...
                 if (conteurDeMises.get(GS) != 1) {
                     if (countAtout >= 6) {
-                        System.out.println("case 7!");
                         return GS;
                     } else if (conteurDeMises.get(G) != 1) {
-                        System.out.println("case 8!");
                         return G;
                     }
                 }
@@ -343,21 +335,17 @@ public class Manche {
                 if (countRoi == 4) {
                     if (countAtout >= 9) {
                         // Si on a 2 bouts, les 4 rois et 9 atouts ou plus on fait une Garde Contre
-                        System.out.println("case 9!");
                         return GC;
                     }
                     if (conteurDeMises.get(GS) != 1) {
                         if (countAtout >= 6) {
-                            System.out.println("case 10!");
                             return GS;
                         }
                         if (conteurDeMises.get(G) != 1) {
                             if (countAtout >= 4) {
-                                System.out.println("case 11!");
                                 return G;
                             }
                             if (conteurDeMises.get(P2) != 1) {
-                                System.out.println("case 12!");
                                 return P2;
                             }
                         }
@@ -365,21 +353,17 @@ public class Manche {
                 }
                 if (countRoi == 3) {
                     if (countAtout >= 12) {
-                        System.out.println("case 13!");
                         return GC;
                     }
                     if (conteurDeMises.get(GS) != 1) {
                         if (countAtout >= 8) {
-                            System.out.println("case 14!");
                             return GS;
                         }
                         if (conteurDeMises.get(G) != 1) {
                             if (countAtout >= 6) {
-                                System.out.println("case 15!");
                                 return G;
                             }
                             if (countAtout >= 4 && conteurDeMises.get(P2) != 1) {
-                                System.out.println("case 16!");
                                 return P2;
                             }
                         }
@@ -388,16 +372,13 @@ public class Manche {
                 if (conteurDeMises.get(GS) != 1) {
                     if (countRoi == 2) {
                         if (countAtout >= 10) {
-                            System.out.println("case 17!");
                             return GS;
                         }
                         if (conteurDeMises.get(G) != 1) {
                             if (countAtout >= 6) {
-                                System.out.println("case 18!");
                                 return G;
                             }
                             if (countAtout >= 4 && conteurDeMises.get(P2) != 1) {
-                                System.out.println("case 19!");
                                 return P2;
                             }
                         }
@@ -405,16 +386,13 @@ public class Manche {
                     if (conteurDeMises.get(G) != 1) {
                         if (countRoi == 1) {
                             if (countAtout >= 8) {
-                                System.out.println("case 20!");
                                 return G;
                             } else if (countAtout >= 4 && conteurDeMises.get(P2) != 1) {
-                                System.out.println("case 21!");
                                 return P2;
                             }
                         }
                         if (countRoi == 0) {
                             if (countAtout >= 6 && conteurDeMises.get(P2) != 1) {
-                                System.out.println("case 22!");
                                 return P2;
                             }
                         }
@@ -425,43 +403,35 @@ public class Manche {
                 if (countBout == 1) {
                     if (countRoi == 4) {
                         if (countAtout >= 6) {
-                            System.out.println("case 23!");
                             return G;
                         }
                         if (countAtout >= 4 && conteurDeMises.get(P2) != 1) {
-                            System.out.println("case 24!");
                             return P2;
                         }
                     }
                     if (countRoi == 3) {
                         if (countAtout >= 8) {
-                            System.out.println("case 25!");
                             return G;
                         } else if (countAtout >= 6 && conteurDeMises.get(P2) != 1) {
-                            System.out.println("case 26!");
                             return P2;
                         }
                     }
                     if (countRoi == 2) {
                         if (countAtout >= 8 && conteurDeMises.get(P2) != 1) {
-                            System.out.println("case 27!");
                             return P2;
                         }
                     }
                 }
                 if (countBout == 0 && countRoi == 4) {
                     if (countAtout >= 10) {
-                        System.out.println("case 28!");
                         return G;
                     }
                     if (countAtout >= 8 && conteurDeMises.get(P2) != 1) {
-                        System.out.println("case 29!");
                         return P2;
                     }
                 }
             }
         }
-        System.out.println("case 30!");
         return P1;
     }
 
@@ -715,16 +685,10 @@ public class Manche {
                     i.roleJoueur = "Defenseur";
                 }
             }
-            System.out.println("taille pli attaquant après gestion du chien: " + pliAttaque.size() + ". Défense: "
-                    + pliDefense.size());
         } else if (attaquant.miseJoueur.equals("Garde Sans")) {
             pliAttaque.addAll(packetChien);
-            System.out.println("taille pli attaquant après gestion du chien: " + pliAttaque.size() + ". Défense: "
-                    + pliDefense.size());
         } else if (attaquant.miseJoueur.equals("Garde Contre")) {
             pliDefense.addAll(packetChien);
-            System.out.println("taille pli attaquant après gestion du chien: " + pliAttaque.size() + ". Défense: "
-                    + pliDefense.size());
         }
     }
 
@@ -965,13 +929,11 @@ public class Manche {
         Carte carteDonnee = null;
         // Si le don est à l'attaque et qu'il n'y a pas d'Excuse à la fin du pli
         if (donALAttaque && !excuseALaFin) {
-            System.out.println("Don à l'attaque de: ");
             // Sélectionne une carte de la défense de façon aléatoire jusqu'à obtenir une
             // carte de valeur 1
             do {
                 carteDonnee = pliDefense.get(rand.nextInt(pliDefense.size()));
             } while (carteDonnee.pointsCarte != 1);
-            System.out.println(carteDonnee.nomCarte);
 
             // Retire la carte donnée du pli de l'attaque et l'ajoute au pli de l'attaque
             pliAttaque.remove(carteDonnee);
@@ -979,11 +941,9 @@ public class Manche {
 
             // Si le don est à la defense
         } else if (donALaDefense) {
-            System.out.println("Don à la defense de: ");
             do {
                 carteDonnee = pliAttaque.get(rand.nextInt(pliAttaque.size()));
             } while (carteDonnee.pointsCarte != 1);
-            System.out.println(carteDonnee.nomCarte);
             pliAttaque.remove(carteDonnee);
             pliDefense.add(carteDonnee);
         }
@@ -1013,15 +973,15 @@ public class Manche {
             }
             // On ajoute une carte avec 1 point au comptage suivie d'une carte spéciale valant plus d'un point
             // C'est la manière naturelle de compter au Tarot, pour obtenir le maximum de points
+            //On ajoute une carte au pliComptage si la carte précedente dans le pliAttaque est de valeur différent
+            //(1 si spéciale, spéciale si 1)
             for (int i = 0; i < pliAttaque.size(); i++) {
                 if (i > 0 && (pliAttaque.get(i - 1).getPoints() == 1 || pliAttaque.get(i).getPoints() == 1)
                         && pliAttaque.get(i - 1).getPoints() != pliAttaque.get(i).getPoints()) {
                     pliComptagePoints.add(pliAttaque.get(i));
                 }
             }
-            for(int i=0;i<pliComptagePoints.size();i++){
-                
-            }
+            //On retire la carte ajoutée du pliAttaque pour permettre une nouvelle succession de cartes
             for (Carte i : pliComptagePoints) {
                 for (Carte j : pliAttaque) {
                     if (i == j) {
@@ -1040,21 +1000,22 @@ public class Manche {
         int mise = 0;
         int victoireDefense = 1; // variable de victoire/défaite de la défense (-1 si l'attaque gagne)
         int nombrePointsPliAttaquant = 0;
+        //Multiplicateur de score en fonction de la mise
         switch (attaquant.miseJoueur) {
             case "Garde Contre":
-                System.out.println("garde contre");
+                System.out.println("Garde Contre");
                 mise = 6;
                 break;
             case "Garde Sans":
-                System.out.println("garde sans");
+                System.out.println("Garde Sans");
                 mise = 4;
                 break;
             case "Garde":
-                System.out.println("garde");
+                System.out.println("Garde");
                 mise = 2;
                 break;
             case "Petite":
-                System.out.println("petite");
+                System.out.println("Petite");
                 mise = 1;
                 break;
             default:
@@ -1062,6 +1023,8 @@ public class Manche {
                 break;
         }
         // Calcul du nombre total de points dans le pli de l'attaque
+        // On compte le cartes 2 par 2, en prenant en compte uniquement la meilleure carte.
+        // D'où la nécessité de la méthode précedente.
         for (int i = 0; i < pliComptagePoints.size(); i += 2) {
             int max = pliComptagePoints.get(i).getPoints();
             if (i < pliComptagePoints.size() - 1 && (max < pliComptagePoints.get(i + 1).getPoints())) {
@@ -1069,8 +1032,6 @@ public class Manche {
             }
             nombrePointsPliAttaquant += max;
         }
-        System.out.println("nombre de points dans le pli attaquant: " + nombrePointsPliAttaquant);
-        System.out.println("Score à réaliser: " + scoreARealiser);
 
         // Calcul de la différence de points par rapport au score à réaliser
         difference = Math.abs(nombrePointsPliAttaquant - scoreARealiser);
@@ -1084,13 +1045,13 @@ public class Manche {
         }
         // Calcul du nombre total de points gagner suite à la fin de la manche
         nombrePointsTotal = ((25 + difference) * mise);
-        System.out.println("nombre de points total: " + nombrePointsTotal);
+        System.out.println("Nombre de points total: " + nombrePointsTotal);
         // Attribution des points aux joueurs en fonction du résultat
         for (Joueur i : joueurs) {
             if (i != attaquant) {
                 i.pointsJoueur += victoireDefense * nombrePointsTotal;
                 if (bonusPetitAuBoutDefenseur) {
-                    System.out.println("bonus petit au bout defenseur");
+                    System.out.println("Bonus petit au bout defenseur");
                     i.pointsJoueur += 10 * mise;
                 }
                 if (bonusPetitAuBoutAttaquant) {
@@ -1100,7 +1061,7 @@ public class Manche {
             } else {
                 attaquant.pointsJoueur += -1 * victoireDefense * nombrePointsTotal * (joueurs.size() - 1);
                 if (bonusPetitAuBoutAttaquant) {
-                    System.out.println("bonus petit au bout attaquant");
+                    System.out.println("Bonus petit au bout attaquant");
                     attaquant.pointsJoueur += 10 * mise * (joueurs.size() - 1);
                 }
                 if (bonusPetitAuBoutDefenseur) {
