@@ -35,10 +35,13 @@ class TestJoueur {
         joueur2Test = new Joueur("joueur2Test", mainTest, 0, 2);
         joueur2Test.roleJoueur = "Attaquant";
         joueur1Test.jouerCarte("Trefle", carteGagnanteTest, false, joueur2Test);
+        //Avec la première stratégie, une carte au hasard de la même couleur que celle demandée sera jouee
+        //car les conditions sont vérifiées ici
         assertEquals(true, joueur1Test.mainJoueur.contains(carteATester));
         joueur2Test.roleJoueur = "Defenseur";
         joueur1Test.roleJoueur = "Attaquant";
         joueur2Test.jouerCarte("Trefle", carteGagnanteTest, false, joueur1Test);
+        //Avecc la seconde stratégie, uniquement la plus petite des cartes de la même couleur sera jouee
         assertEquals(false, joueur2Test.mainJoueur.contains(plusPetitTrefle));
     }
 
